@@ -1136,123 +1136,290 @@ function Always80AppInner() {
       backgroundPosition: "center",
       backgroundAttachment: "fixed",
     }}>
+      {/* Top Bar — announcement */}
+      <div className="text-center py-2 text-xs font-medium tracking-wide" style={{ backgroundColor: COLORS.teal, color: "#0A1628" }}>
+        FREE SHIPPING ON ORDERS OVER $50 &nbsp;|&nbsp; SOLANA DEVNET — TEST MODE
+      </div>
+
       {/* Nav — sticky */}
-      <nav className="border-b px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40" style={{ borderColor: "#2D2550", backgroundColor: COLORS.darkBg }}>
-        <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Always 80 and Sunny" className="h-[135px] w-auto rounded-lg" />
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="text-white font-bold text-lg">Always 80</span>
-            <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#0D3B2E", color: COLORS.teal }}>DEVNET</span>
-          </div>
+      <nav className="border-b px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40" style={{ borderColor: "rgba(255,255,255,0.1)", backgroundColor: "rgba(10, 22, 40, 0.95)", backdropFilter: "blur(12px)" }}>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView("storefront")}>
+          <img src="/logo.png" alt="Always 80 and Sunny" className="h-[80px] w-auto rounded-lg" />
         </div>
-        <div className="flex gap-1">
+        <div className="hidden md:flex gap-1">
           {views.map((v) => (
             <button
               key={v.key}
               onClick={() => setView(v.key as ViewKey)}
-              className="px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer"
-              style={{ backgroundColor: view === v.key ? COLORS.purple : "transparent", color: view === v.key ? "white" : COLORS.lightText }}
+              className="px-4 py-2 text-sm font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+              style={{ color: view === v.key ? "white" : "rgba(200,214,229,0.7)", borderBottom: view === v.key ? `2px solid ${COLORS.teal}` : "2px solid transparent" }}
             >
               {v.label}
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2">
-          {cart.length > 0 && (
-            <button onClick={() => setShowCart(true)} className="relative px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer" style={{ backgroundColor: COLORS.purple, color: "white" }}>
-              🛒 {cart.reduce((sum, c) => sum + c.quantity, 0)}
-            </button>
-          )}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowCart(true)}
+            className="relative cursor-pointer p-2 rounded-lg transition-colors hover:bg-white/10"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            {cart.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center" style={{ backgroundColor: COLORS.teal, color: "#0A1628" }}>
+                {cart.reduce((sum, c) => sum + c.quantity, 0)}
+              </span>
+            )}
+          </button>
           <WalletModalButton walletModal={walletModal} />
+          {/* Mobile menu toggle */}
+          <button className="md:hidden cursor-pointer p-2" onClick={() => {
+            const el = document.getElementById("mobile-nav");
+            if (el) el.classList.toggle("hidden");
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
         </div>
       </nav>
+      {/* Mobile nav dropdown */}
+      <div id="mobile-nav" className="hidden md:hidden border-b" style={{ backgroundColor: COLORS.darkBg, borderColor: "#2D2550" }}>
+        {views.map((v) => (
+          <button
+            key={v.key}
+            onClick={() => { setView(v.key as ViewKey); document.getElementById("mobile-nav")?.classList.add("hidden"); }}
+            className="block w-full text-left px-6 py-3 text-sm font-semibold uppercase tracking-wider cursor-pointer"
+            style={{ color: view === v.key ? "white" : COLORS.lightText, backgroundColor: view === v.key ? "rgba(14,165,233,0.1)" : "transparent" }}
+          >
+            {v.label}
+          </button>
+        ))}
+      </div>
 
       <WalletModal walletModal={walletModal} />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        {view === "storefront" && (
-          <div className="space-y-8">
-            <div className="rounded-lg p-3 text-center text-xs" style={{ backgroundColor: "#0D3B2E", color: COLORS.teal }}>
-              You are on <strong>Solana Devnet</strong> — all transactions use test SOL. Use the Dashboard to airdrop free test SOL.
-            </div>
-
-            {canceledNotice && (
+      {/* STOREFRONT */}
+      {view === "storefront" && (
+        <div>
+          {canceledNotice && (
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4">
               <div className="rounded-lg p-3 text-center text-sm" style={{ backgroundColor: "#3B1B1B", border: "1px solid #DC2626", color: "#FCA5A5" }}>
                 Payment was canceled. You can try again anytime.
               </div>
-            )}
-
-            {/* Creator header */}
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-black shrink-0" style={{ background: `linear-gradient(135deg, ${COLORS.purple}, ${COLORS.teal})`, color: "white" }}>
-                {creator.avatar}
-              </div>
-              <div>
-                <h1 className="text-2xl font-black text-white">{creator.name}</h1>
-                <p className="text-sm" style={{ color: COLORS.lightText }}>{creator.bio}</p>
-                <p className="text-xs mt-1" style={{ color: COLORS.midGray }}>{creator.subscribers.toLocaleString()} subscribers</p>
-              </div>
             </div>
+          )}
 
-            {/* Subscription status */}
-            {subscribedTier && (
+          {/* Subscription status */}
+          {subscribedTier && (
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4">
               <div className="rounded-lg p-3 flex items-center gap-2" style={{ backgroundColor: "#0D3B2E", border: "1px solid #14F195" }}>
                 <span style={{ color: COLORS.teal }}>&#10003;</span>
                 <span className="text-sm font-medium" style={{ color: COLORS.teal }}>
-                  You're subscribed to {subscribedTier}! Check the Feed for exclusive content.
+                  You&apos;re subscribed to {subscribedTier}! Check the Feed for exclusive content.
                 </span>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Featured Video */}
-            <div>
-              <h2 className="text-lg font-bold text-white mb-4">Featured Video</h2>
-              <div className="rounded-xl overflow-hidden border" style={{ borderColor: "#2D2550" }}>
-                <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                  <iframe
-                    className="absolute inset-0 w-full h-full"
-                    src={`https://www.youtube.com/embed/${VIDEOS.find(v => v.featured)?.youtubeId || VIDEOS[0].youtubeId}`}
-                    title={VIDEOS.find(v => v.featured)?.title || VIDEOS[0].title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-                <div className="px-4 py-3" style={{ backgroundColor: COLORS.cardBg }}>
-                  <p className="text-white font-semibold text-sm">{VIDEOS.find(v => v.featured)?.title || VIDEOS[0].title}</p>
+          {/* === HERO BANNER === */}
+          <div className="relative w-full overflow-hidden" style={{ height: "520px" }}>
+            <div className="absolute inset-0" style={{
+              backgroundImage: "url(/beach-bg.jpg)",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              filter: "brightness(0.6)",
+            }} />
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6" style={{ background: "linear-gradient(to bottom, rgba(10,22,40,0.2), rgba(10,22,40,0.7))" }}>
+              <img src="/logo.png" alt="Always 80 and Sunny" className="h-[140px] w-auto mb-4 drop-shadow-2xl" />
+              <h1 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-wider mb-3" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
+                CUSTOM BAITS & TACKLE
+              </h1>
+              <p className="text-lg text-white/80 mb-6 max-w-lg" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.5)" }}>
+                Hand-painted swimbaits, premium tackle, and unforgettable fishing charters
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" }); }}
+                  className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105"
+                  style={{ backgroundColor: "white", color: "#0A1628" }}
+                >
+                  Shop Now
+                </button>
+                <button
+                  onClick={() => setView("charters")}
+                  className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105 border-2 border-white"
+                  style={{ backgroundColor: "transparent", color: "white" }}
+                >
+                  Book a Charter
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* === SHOP BY CATEGORY (horizontal scroll) === */}
+          <div className="py-10 px-4 sm:px-6" style={{ backgroundColor: "rgba(10,22,40,0.85)" }}>
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-center text-2xl font-black text-white uppercase tracking-wider mb-6">Shop by Category</h2>
+              <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
+                {[
+                  { label: "Swimbaits", emoji: "🎣", filter: "tackle" },
+                  { label: "Apparel", emoji: "👕", filter: "apparel" },
+                  { label: "Jig Heads", emoji: "🪝", filter: "tackle" },
+                  { label: "Sun Shirts", emoji: "☀️", filter: "apparel" },
+                  { label: "Tackle Bags", emoji: "🎒", filter: "tackle" },
+                  { label: "Charters", emoji: "🚤", filter: "charters" },
+                  { label: "Memberships", emoji: "⭐", filter: "memberships" },
+                ].map((cat, i) => (
                   <button
-                    onClick={() => setView("videos")}
-                    className="text-xs mt-1 cursor-pointer hover:underline"
-                    style={{ color: COLORS.teal }}
+                    key={i}
+                    onClick={() => {
+                      if (cat.filter === "charters") { setView("charters"); return; }
+                      if (cat.filter === "memberships") { const el = document.getElementById("tiers-section"); el?.scrollIntoView({ behavior: "smooth" }); return; }
+                      const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="flex flex-col items-center gap-2 cursor-pointer group shrink-0"
                   >
-                    Browse all {VIDEOS.length} videos →
+                    <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl transition-all group-hover:scale-110" style={{ backgroundColor: COLORS.cardBg, border: "2px solid rgba(255,255,255,0.15)" }}>
+                      {cat.emoji}
+                    </div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-white/80 group-hover:text-white">{cat.label}</span>
                   </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* === FEATURED VIDEO === */}
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-black text-white uppercase tracking-wider">Featured Video</h2>
+              <button onClick={() => setView("videos")} className="text-sm font-semibold cursor-pointer hover:underline" style={{ color: COLORS.teal }}>
+                View All Videos →
+              </button>
+            </div>
+            <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${VIDEOS.find(v => v.featured)?.youtubeId || VIDEOS[0].youtubeId}`}
+                  title={VIDEOS.find(v => v.featured)?.title || VIDEOS[0].title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* === LIFESTYLE BANNER 1 === */}
+          <div className="relative w-full py-16" style={{
+            backgroundImage: "linear-gradient(135deg, rgba(217,119,6,0.15), rgba(14,165,233,0.15))",
+            backgroundColor: "rgba(10,22,40,0.9)",
+          }}>
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center gap-8">
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-3xl font-black text-white uppercase tracking-wider mb-3">Fresh Gear, Built for the Water</h2>
+                <p className="text-base mb-5" style={{ color: COLORS.lightText }}>
+                  UPF 50+ performance shirts, quick-dry shorts, and gear that handles anything the ocean throws at you.
+                </p>
+                <button
+                  onClick={() => { const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" }); }}
+                  className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105"
+                  style={{ backgroundColor: COLORS.teal, color: "#0A1628" }}
+                >
+                  Shop Apparel
+                </button>
+              </div>
+              <div className="flex-1 flex justify-center gap-3">
+                {MERCH.filter(m => m.category === "apparel").slice(0, 3).map((item) => (
+                  <div key={item.id} className="w-28 h-28 rounded-xl flex items-center justify-center text-5xl" style={{ backgroundColor: COLORS.cardBg }}>
+                    {item.emoji}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* === MERCHANDISE — Horizontal Scrollable Carousel === */}
+          <div id="merch-section" className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-black text-white uppercase tracking-wider">New Arrivals</h2>
+              <div className="flex items-center gap-2">
+                <span className="text-sm" style={{ color: COLORS.midGray }}>{MERCH.length} items</span>
+              </div>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
+              {MERCH.map((item) => (
+                <div key={item.id} className="shrink-0 w-64">
+                  <MerchCard item={item} onAddToCart={handleAddToCart} />
                 </div>
+              ))}
+            </div>
+          </div>
+
+          {/* === LIFESTYLE BANNER 2 — Charters === */}
+          <div className="relative w-full py-20" style={{
+            backgroundImage: "linear-gradient(to right, rgba(10,22,40,0.9), rgba(10,22,40,0.5)), url(/beach-bg.jpg)",
+            backgroundSize: "cover",
+            backgroundPosition: "center bottom",
+          }}>
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+              <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider mb-3">Book Your Adventure</h2>
+              <p className="text-base mb-6 max-w-lg" style={{ color: "rgba(255,255,255,0.8)" }}>
+                Inshore, offshore, or sunset cruises — every trip includes tackle, bait, and a Coast Guard certified captain.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setView("charters")}
+                  className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105"
+                  style={{ backgroundColor: "white", color: "#0A1628" }}
+                >
+                  View Charters
+                </button>
+                <button
+                  onClick={() => setView("charters")}
+                  className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105 border-2 border-white"
+                  style={{ backgroundColor: "transparent", color: "white" }}
+                >
+                  Starting at $250
+                </button>
               </div>
             </div>
+          </div>
 
-            {/* Merchandise */}
-            <div>
-              <h2 className="text-lg font-bold text-white mb-4">Merchandise</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                {MERCH.map((item) => (
-                  <MerchCard key={item.id} item={item} onAddToCart={handleAddToCart} />
-                ))}
-              </div>
+          {/* === BEST SELLERS — Tackle Carousel === */}
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-black text-white uppercase tracking-wider">Best Sellers</h2>
             </div>
-
-            {/* Products */}
-            <div>
-              <h2 className="text-lg font-bold text-white mb-4">Products & Downloads</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {creator.products.map((product) => (
-                  <ProductCard key={product.id} product={product} onPurchase={handlePurchase} openWalletModal={() => walletModal.setVisible(true)} />
-                ))}
-              </div>
+            <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
+              {[...MERCH].sort(() => 0.5 - Math.random()).map((item) => (
+                <div key={`best-${item.id}`} className="shrink-0 w-64">
+                  <MerchCard item={item} onAddToCart={handleAddToCart} />
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* Membership tiers */}
-            <div>
-              <h2 className="text-lg font-bold text-white mb-4">Membership Tiers</h2>
+          {/* === PRODUCTS & DOWNLOADS === */}
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+            <h2 className="text-2xl font-black text-white uppercase tracking-wider mb-6">Products & Downloads</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {creator.products.map((product) => (
+                <ProductCard key={product.id} product={product} onPurchase={handlePurchase} openWalletModal={() => walletModal.setVisible(true)} />
+              ))}
+            </div>
+          </div>
+
+          {/* === MEMBERSHIP TIERS === */}
+          <div id="tiers-section" className="py-12 px-4 sm:px-6" style={{ backgroundColor: "rgba(10,22,40,0.9)" }}>
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-black text-white uppercase tracking-wider mb-2">Membership Tiers</h2>
+                <p className="text-sm" style={{ color: COLORS.lightText }}>Unlock exclusive content, secret spots, and VIP charter access</p>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {creator.tiers.map((tier, i) => (
                   <TierCard
@@ -1266,9 +1433,11 @@ function Always80AppInner() {
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Purchase confirmations */}
-            {purchases.length > 0 && (
+          {/* Purchase confirmations */}
+          {purchases.length > 0 && (
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
               <div className="rounded-xl p-4 border space-y-2" style={{ backgroundColor: "#0D3B2E", borderColor: COLORS.teal }}>
                 <p className="text-sm font-medium" style={{ color: COLORS.teal }}>&#10003; {purchases.length} item(s) unlocked!</p>
                 {purchases.filter(p => p.signature).map((p, i) => (
@@ -1277,14 +1446,18 @@ function Always80AppInner() {
                   </a>
                 ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Newsletter */}
+          {/* Newsletter */}
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
             <NewsletterSection />
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Cart / Order Modal */}
+      {/* Cart / Order Modal */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {showCart && (
           <OrderModal
             cart={cart}
@@ -1492,10 +1665,73 @@ function Always80AppInner() {
         )}
       </div>
 
-      <footer className="border-t px-6 py-4 text-center" style={{ borderColor: "#2D2550" }}>
-        <p className="text-xs" style={{ color: COLORS.midGray }}>
-          Always 80 and Sunny — Custom Baits, Tackle & Charters on Solana | Near-zero fees. Instant payouts. | Devnet
-        </p>
+      {/* === FOOTER — Salt Life inspired multi-column === */}
+      <footer className="border-t" style={{ borderColor: "rgba(255,255,255,0.1)", backgroundColor: "rgba(10,22,40,0.95)" }}>
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            {/* Brand */}
+            <div>
+              <img src="/logo.png" alt="Always 80 and Sunny" className="h-16 w-auto mb-3" />
+              <p className="text-xs" style={{ color: COLORS.midGray }}>
+                Custom baits, premium tackle, and unforgettable fishing charters — powered by Solana.
+              </p>
+            </div>
+            {/* Shop */}
+            <div>
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Shop</h4>
+              <div className="space-y-2">
+                {[
+                  { label: "Apparel", action: () => { const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" }); setView("storefront"); } },
+                  { label: "Tackle", action: () => { const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" }); setView("storefront"); } },
+                  { label: "Products & Downloads", action: () => setView("storefront") },
+                  { label: "Memberships", action: () => setView("storefront") },
+                ].map((link) => (
+                  <button key={link.label} onClick={link.action} className="block text-xs cursor-pointer hover:text-white transition-colors" style={{ color: COLORS.midGray }}>
+                    {link.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Explore */}
+            <div>
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Explore</h4>
+              <div className="space-y-2">
+                {[
+                  { label: "Fishing Charters", action: () => setView("charters") },
+                  { label: "Videos", action: () => setView("videos") },
+                  { label: "Feed & Reports", action: () => setView("feed") },
+                ].map((link) => (
+                  <button key={link.label} onClick={link.action} className="block text-xs cursor-pointer hover:text-white transition-colors" style={{ color: COLORS.midGray }}>
+                    {link.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Connect */}
+            <div>
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Connect</h4>
+              <div className="space-y-2">
+                <p className="text-xs" style={{ color: COLORS.midGray }}>Follow us for daily fishing reports and charter updates.</p>
+                <div className="flex gap-3 mt-3">
+                  {["YouTube", "Instagram", "TikTok"].map((social) => (
+                    <span key={social} className="text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:opacity-80" style={{ backgroundColor: COLORS.cardBg, color: COLORS.lightText }}>
+                      {social}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="border-t pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+            <p className="text-xs" style={{ color: COLORS.midGray }}>
+              &copy; 2026 Always 80 and Sunny. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4">
+              <span className="text-xs" style={{ color: COLORS.midGray }}>Powered by Solana</span>
+              <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#0D3B2E", color: COLORS.teal }}>DEVNET</span>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   );
