@@ -93,7 +93,7 @@ export async function GET() {
   // Save the daily summary page to Blob
   const summaryFilename = `daily-summary-${today}.html`;
   const summaryBlob = await put(`labels/${summaryFilename}`, summaryHTML, {
-    access: "public",
+
     addRandomSuffix: false,
     contentType: "text/html",
   });

@@ -19,7 +19,7 @@
     "stripe": "^17.5.0",
     "@stripe/stripe-js": "^5.5.0",
     "@anthropic-ai/sdk": "^0.39.0",
-    "@vercel/blob": "^0.27.0"
+    "@vercel/blob": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

@@ -36,7 +36,7 @@ async function getOrders(): Promise<OrderRecord[]> {
 
 async function saveOrders(orders: OrderRecord[]) {
   await put(ORDERS_BLOB_KEY, JSON.stringify(orders, null, 2), {
-    access: "public",
+
     addRandomSuffix: false,
   });
 }
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
 
         if (inventoryUpdated) {
           await put(INVENTORY_BLOB_KEY, JSON.stringify(inventory, null, 2), {
-            access: "public",
+        
             addRandomSuffix: false,
           });
         }

@@ -18,7 +18,7 @@ async function readBlob<T>(key: string, fallback: T): Promise<T> {
 
 async function writeBlob(key: string, data: unknown) {
   await put(key, JSON.stringify(data, null, 2), {
-    access: "public",
+
     addRandomSuffix: false,
   });
 }
