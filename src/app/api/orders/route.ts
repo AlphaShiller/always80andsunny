@@ -4,6 +4,7 @@ import path from "path";
 
 const DATA_DIR = "/tmp/always80-data";
 const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
+const INVENTORY_FILE = path.join(DATA_DIR, "inventory.json");
 
 function ensureDataDir() {
   const dir = path.dirname(ORDERS_FILE);
@@ -76,6 +77,37 @@ export async function POST(req: NextRequest) {
     const orders = getOrders();
     orders.push(order);
     saveOrders(orders);
+
+    // Deduct purchased quantities from inventory
+    try {
+      if (fs.existsSync(INVENTORY_FILE)) {
+        const invRaw = fs.readFileSync(INVENTORY_FILE, "utf-8");
+        const inventory = JSON.parse(invRaw);
+        let inventoryUpdated = false;
+
+        for (const orderItem of items) {
+          if (!orderItem.merchId) continue;
+          const invIdx = inventory.findIndex((inv: { id: string }) => inv.id === orderItem.merchId);
+          if (invIdx !== -1) {
+            const currentQty = inventory[invIdx].quantity || 0;
+            inventory[invIdx].quantity = Math.max(0, currentQty - (orderItem.quantity || 1));
+            inventory[invIdx].updatedAt = new Date().toISOString();
+            // Auto-set to out_of_stock if quantity hits 0
+            if (inventory[invIdx].quantity === 0) {
+              inventory[invIdx].status = "out_of_stock";
+            }
+            inventoryUpdated = true;
+          }
+        }
+
+        if (inventoryUpdated) {
+          fs.writeFileSync(INVENTORY_FILE, JSON.stringify(inventory, null, 2));
+        }
+      }
+    } catch (invErr) {
+      console.error("Failed to update inventory quantities:", invErr);
+      // Order still succeeds even if inventory deduction fails
+    }
 
     return NextResponse.json({ order });
   } catch {

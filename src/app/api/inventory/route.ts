@@ -24,6 +24,7 @@ interface InventoryRecord {
   quantity: number;
   weight?: string;
   dimensions?: string;
+  cost: number;
   price: number;
   priceSol?: number;
   requirements?: string;
@@ -71,6 +72,7 @@ export async function POST(req: NextRequest) {
       quantity: body.quantity || 0,
       weight: body.weight || "",
       dimensions: body.dimensions || "",
+      cost: body.cost || 0,
       price: body.price || 0,
       priceSol: body.priceSol || 0,
       requirements: body.requirements || "",
@@ -110,7 +112,7 @@ export async function PATCH(req: NextRequest) {
     // Apply updates
     const updatableFields = [
       "name", "category", "imageUrl", "sizes", "gender", "quantity",
-      "weight", "dimensions", "price", "priceSol", "requirements",
+      "weight", "dimensions", "cost", "price", "priceSol", "requirements",
       "description", "sku", "status",
     ];
 

@@ -13,6 +13,7 @@ interface InventoryItem {
   quantity: number;
   weight?: string;
   dimensions?: string;
+  cost: number;
   price: number;
   priceSol?: number;
   requirements?: string;
@@ -43,7 +44,7 @@ export default function InventoryTable() {
   const [showAddRow, setShowAddRow] = useState(false);
   const [newItem, setNewItem] = useState({
     name: "", category: "apparel" as const, sizes: "", gender: "unisex",
-    quantity: 0, weight: "", dimensions: "", price: 0, priceSol: 0,
+    quantity: 0, weight: "", dimensions: "", cost: 0, price: 0, priceSol: 0,
     requirements: "", description: "", sku: "",
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -101,7 +102,7 @@ export default function InventoryTable() {
         setItems((prev) => [data.item, ...prev]);
         setNewItem({
           name: "", category: "apparel", sizes: "", gender: "unisex",
-          quantity: 0, weight: "", dimensions: "", price: 0, priceSol: 0,
+          quantity: 0, weight: "", dimensions: "", cost: 0, price: 0, priceSol: 0,
           requirements: "", description: "", sku: "",
         });
         setShowAddRow(false);
@@ -173,7 +174,10 @@ export default function InventoryTable() {
   };
 
   const totalValue = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const totalCost = items.reduce((s, i) => s + (i.cost || 0) * i.quantity, 0);
   const totalUnits = items.reduce((s, i) => s + i.quantity, 0);
+  const totalProfit = totalValue - totalCost;
+  const avgMargin = totalValue > 0 ? ((totalProfit / totalValue) * 100) : 0;
   const outOfStock = items.filter((i) => i.quantity === 0 || i.status === "out_of_stock").length;
 
   const cellStyle = {
@@ -339,6 +343,7 @@ export default function InventoryTable() {
             {[
               { key: "name", label: "Product Name", placeholder: "e.g. Custom Swimbait", type: "text" },
               { key: "sku", label: "SKU", placeholder: "e.g. SWM-001", type: "text" },
+              { key: "cost", label: "Cost ($)", placeholder: "12.50", type: "number" },
               { key: "price", label: "Price ($)", placeholder: "29.99", type: "number" },
               { key: "priceSol", label: "Price (SOL)", placeholder: "0.22", type: "number" },
               { key: "sizes", label: "Sizes", placeholder: "S, M, L, XL", type: "text" },
@@ -387,17 +392,20 @@ export default function InventoryTable() {
       {/* Spreadsheet table */}
       <div className="rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: "#CBD5E1", backgroundColor: "white" }}>
         <div className="overflow-x-auto" style={{ maxHeight: "calc(100vh - 340px)" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "1400px" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "1800px" }}>
             <thead>
               <tr>
                 <th style={{ ...headerStyle, minWidth: "60px" }}>Image</th>
                 <th style={{ ...headerStyle, minWidth: "160px" }}>Product Name</th>
+                <th style={{ ...headerStyle, minWidth: "200px" }}>Description</th>
                 <th style={{ ...headerStyle, minWidth: "80px" }}>SKU</th>
                 <th style={{ ...headerStyle, minWidth: "90px" }}>Category</th>
                 <th style={{ ...headerStyle, minWidth: "100px" }}>Sizes</th>
                 <th style={{ ...headerStyle, minWidth: "80px" }}>Gender</th>
                 <th style={{ ...headerStyle, minWidth: "60px", textAlign: "right" }}>Qty</th>
+                <th style={{ ...headerStyle, minWidth: "80px", textAlign: "right" }}>Cost</th>
                 <th style={{ ...headerStyle, minWidth: "80px", textAlign: "right" }}>Price</th>
+                <th style={{ ...headerStyle, minWidth: "70px", textAlign: "right" }}>Margin</th>
                 <th style={{ ...headerStyle, minWidth: "80px" }}>Weight</th>
                 <th style={{ ...headerStyle, minWidth: "100px" }}>Dimensions</th>
                 <th style={{ ...headerStyle, minWidth: "120px" }}>Requirements</th>
@@ -408,7 +416,7 @@ export default function InventoryTable() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={13} style={{ ...cellStyle, textAlign: "center", padding: "40px 12px" }}>
+                  <td colSpan={16} style={{ ...cellStyle, textAlign: "center", padding: "40px 12px" }}>
                     <div>
                       <p className="text-lg mb-1" style={{ color: COLORS.midGray }}>
                         {items.length === 0 ? "No products yet" : "No matching products"}
@@ -452,6 +460,7 @@ export default function InventoryTable() {
                       </td>
 
                       {renderEditableCell(item, "name", "Product name", "160px")}
+                      {renderEditableCell(item, "description", "Product description for storefront", "200px")}
                       {renderEditableCell(item, "sku", "SKU", "80px")}
 
                       {/* Category (dropdown) */}
@@ -472,6 +481,27 @@ export default function InventoryTable() {
                       {/* Quantity */}
                       {renderEditableCell(item, "quantity", "0", "60px")}
 
+                      {/* Cost */}
+                      <td
+                        style={{ ...cellStyle, textAlign: "right", cursor: "pointer", minWidth: "80px" }}
+                        onClick={() => startEdit(item.id, "cost", String(item.cost))}
+                      >
+                        {editingCell?.itemId === item.id && editingCell?.field === "cost" ? (
+                          <input
+                            type="text"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onKeyDown={(e) => handleKeyDown(e, item.id, "cost")}
+                            onBlur={() => updateField(item.id, "cost", parseFloat(editValue) || 0)}
+                            autoFocus
+                            className="w-full rounded px-2 py-1 text-xs outline-none text-right"
+                            style={{ backgroundColor: "white", color: "#0A1628", border: `2px solid ${COLORS.teal}` }}
+                          />
+                        ) : (
+                          <span style={{ color: "#64748B", fontWeight: 600 }}>${(item.cost || 0).toFixed(2)}</span>
+                        )}
+                      </td>
+
                       {/* Price */}
                       <td
                         style={{ ...cellStyle, textAlign: "right", cursor: "pointer", minWidth: "80px" }}
@@ -490,6 +520,20 @@ export default function InventoryTable() {
                           />
                         ) : (
                           <span style={{ color: COLORS.teal, fontWeight: 600 }}>${item.price.toFixed(2)}</span>
+                        )}
+                      </td>
+
+                      {/* Margin */}
+                      <td style={{ ...cellStyle, textAlign: "right", minWidth: "70px" }}>
+                        {item.price > 0 && item.cost > 0 ? (
+                          <span style={{
+                            color: ((item.price - item.cost) / item.price) * 100 >= 50 ? "#065F46" : ((item.price - item.cost) / item.price) * 100 >= 25 ? "#92400E" : "#991B1B",
+                            fontWeight: 600,
+                          }}>
+                            {(((item.price - item.cost) / item.price) * 100).toFixed(1)}%
+                          </span>
+                        ) : (
+                          <span style={{ color: "#94A3B8", fontStyle: "italic" }}>—</span>
                         )}
                       </td>
 
@@ -539,8 +583,20 @@ export default function InventoryTable() {
           <span className="text-lg font-black" style={{ color: COLORS.teal }}>{totalUnits.toLocaleString()}</span>
         </div>
         <div>
-          <span className="text-xs block" style={{ color: COLORS.midGray }}>Inventory Value</span>
+          <span className="text-xs block" style={{ color: COLORS.midGray }}>Total Cost</span>
+          <span className="text-lg font-black" style={{ color: "#64748B" }}>${totalCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+        </div>
+        <div>
+          <span className="text-xs block" style={{ color: COLORS.midGray }}>Retail Value</span>
           <span className="text-lg font-black" style={{ color: COLORS.teal }}>${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+        </div>
+        <div>
+          <span className="text-xs block" style={{ color: COLORS.midGray }}>Potential Profit</span>
+          <span className="text-lg font-black" style={{ color: "#065F46" }}>${totalProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+        </div>
+        <div>
+          <span className="text-xs block" style={{ color: COLORS.midGray }}>Avg Margin</span>
+          <span className="text-lg font-black" style={{ color: avgMargin >= 50 ? "#065F46" : avgMargin >= 25 ? "#92400E" : "#991B1B" }}>{avgMargin.toFixed(1)}%</span>
         </div>
         <div>
           <span className="text-xs block" style={{ color: COLORS.midGray }}>Out of Stock</span>
