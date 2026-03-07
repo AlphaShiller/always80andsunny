@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import seedInventory from "@/data/seed-inventory.json";
 
 const DATA_DIR = "/tmp/always80-data";
 const INVENTORY_FILE = path.join(DATA_DIR, "inventory.json");
 
 function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(INVENTORY_FILE)) fs.writeFileSync(INVENTORY_FILE, "[]");
+  if (!fs.existsSync(INVENTORY_FILE)) {
+    // Seed with default products on first cold start
+    fs.writeFileSync(INVENTORY_FILE, JSON.stringify(seedInventory, null, 2));
+  }
 }
 
 interface InventoryRecord {

@@ -162,17 +162,8 @@ interface MerchItem {
   status?: string;
 }
 
-// Fallback merch shown when inventory is empty
-const DEFAULT_MERCH: MerchItem[] = [
-  { id: "m1", name: "Always 80 Performance Sun Shirt", price: 34.99, priceSol: 0.25, category: "apparel", description: "UPF 50+ long sleeve performance shirt", emoji: "👕", sizes: ["XS", "S", "M", "L", "XL", "2XL"] },
-  { id: "m2", name: "Captain's Hoodie", price: 44.99, priceSol: 0.33, category: "apparel", description: "Lightweight hoodie for cool mornings on the water", emoji: "🧥", sizes: ["S", "M", "L", "XL", "2XL"] },
-  { id: "m3", name: "Always 80 Trucker Hat", price: 24.99, priceSol: 0.18, category: "apparel", description: "Snapback with embroidered logo", emoji: "🧢" },
-  { id: "m4", name: "Dry Bag Backpack", price: 39.99, priceSol: 0.29, category: "apparel", description: "Waterproof 20L backpack for gear and tackle", emoji: "🎒" },
-  { id: "m5", name: "Custom Swimbait 6-Pack", price: 29.99, priceSol: 0.22, category: "tackle", description: "6 hand-painted swimbaits in exclusive colors", emoji: "🎣" },
-  { id: "m6", name: "Inshore Jig Head Collection", price: 19.99, priceSol: 0.15, category: "tackle", description: "12 jig heads, various weights for inshore fishing", emoji: "🪝" },
-  { id: "m7", name: "Leader & Rigging Kit", price: 24.99, priceSol: 0.18, category: "tackle", description: "Fluorocarbon leaders, swivels, and crimps", emoji: "🧵" },
-  { id: "m8", name: "Offshore Trolling Lure Set", price: 44.99, priceSol: 0.33, category: "tackle", description: "4 premium trolling lures for pelagic species", emoji: "🐟" },
-];
+// Empty fallback — real items come from /api/inventory which seeds from seed-inventory.json
+const DEFAULT_MERCH: MerchItem[] = [];
 
 // Map category to a fallback emoji
 function categoryEmoji(cat: string): string {
