@@ -766,7 +766,7 @@ function MerchCard({ item, onAddToCart }: { item: MerchItem; onAddToCart: (item:
 
   return (
     <div className="rounded-xl p-4 border transition-all hover:border-purple-500" style={{ backgroundColor: COLORS.cardBg, borderColor: "#2D2550" }}>
-      <div className="text-4xl mb-3 text-center py-4 rounded-lg" style={{ backgroundColor: "#150F28" }}>{item.emoji}</div>
+      <div className="text-7xl mb-3 text-center py-8 rounded-lg" style={{ backgroundColor: "#150F28" }}>{item.emoji}</div>
       <div className="flex justify-between items-start mb-1">
         <h3 className="text-white font-bold text-sm leading-tight">{item.name}</h3>
         <span className="text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ml-2" style={{ backgroundColor: item.category === "apparel" ? "#2D1B69" : "#0D3B2E", color: item.category === "apparel" ? "#C4B5FD" : COLORS.teal }}>
@@ -1139,7 +1139,7 @@ function Always80AppInner() {
       {/* Nav — sticky */}
       <nav className="border-b px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40" style={{ borderColor: "#2D2550", backgroundColor: COLORS.darkBg }}>
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Always 80 and Sunny" className="h-[90px] w-auto rounded-lg" />
+          <img src="/logo.png" alt="Always 80 and Sunny" className="h-[135px] w-auto rounded-lg" />
           <div className="hidden sm:flex items-center gap-2">
             <span className="text-white font-bold text-lg">Always 80</span>
             <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#0D3B2E", color: COLORS.teal }}>DEVNET</span>
