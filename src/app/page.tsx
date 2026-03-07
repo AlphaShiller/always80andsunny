@@ -1522,7 +1522,7 @@ function Always80AppInner() {
           <div className="py-10 px-4 sm:px-6" style={{ backgroundColor: "#E0F2FE" }}>
             <div className="max-w-6xl mx-auto">
               <h2 className="text-center text-2xl font-black uppercase tracking-wider mb-6" style={{ color: "#0A1628" }}>Shop by Category</h2>
-              <div className="flex flex-wrap justify-center gap-8 pb-4">
+              <div className="flex justify-center gap-4 pb-4">
                 {[
                   { label: "Swimbaits", emoji: "🎣", filter: "tackle" },
                   { label: "Apparel", emoji: "👕", filter: "apparel" },
@@ -1547,10 +1547,10 @@ function Always80AppInner() {
                     }}
                     className="flex flex-col items-center gap-3 cursor-pointer group"
                   >
-                    <div className="w-40 h-40 rounded-full flex items-center justify-center text-6xl transition-all group-hover:scale-110 shadow-md" style={{ backgroundColor: "white", border: "2px solid #CBD5E1" }}>
+                    <div className="w-28 h-28 rounded-full flex items-center justify-center text-4xl transition-all group-hover:scale-110 shadow-md" style={{ backgroundColor: "white", border: "2px solid #CBD5E1" }}>
                       {cat.emoji}
                     </div>
-                    <span className="text-base font-semibold uppercase tracking-wider group-hover:text-gray-900" style={{ color: "#334155" }}>{cat.label}</span>
+                    <span className="text-sm font-semibold uppercase tracking-wider group-hover:text-gray-900" style={{ color: "#334155" }}>{cat.label}</span>
                   </button>
                 ))}
               </div>
