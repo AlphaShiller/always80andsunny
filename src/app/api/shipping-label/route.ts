@@ -31,7 +31,7 @@ async function getOrders(): Promise<Order[]> {
   try {
     const { blobs } = await list({ prefix: ORDERS_BLOB_KEY });
     if (blobs.length === 0) return [];
-    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    const res = await fetch(blobs[0].downloadUrl, { cache: "no-store" });
     return await res.json();
   } catch {
     return [];
@@ -40,7 +40,7 @@ async function getOrders(): Promise<Order[]> {
 
 async function saveOrders(orders: Order[]) {
   await put(ORDERS_BLOB_KEY, JSON.stringify(orders, null, 2), {
-    access: "public",
+    access: "private",
     addRandomSuffix: false,
   });
 }
@@ -134,7 +134,7 @@ export async function GET(req: NextRequest) {
   // Save label to Blob for direct access
   const filename = `label-${order.id}.html`;
   await put(`${LABELS_BLOB_PREFIX}${filename}`, html, {
-    access: "public",
+    access: "private",
     addRandomSuffix: false,
     contentType: "text/html",
   });
@@ -159,12 +159,12 @@ export async function POST() {
     const html = generateLabelHTML(order);
     const filename = `label-${order.id}.html`;
     const blob = await put(`${LABELS_BLOB_PREFIX}${filename}`, html, {
-      access: "public",
+      access: "private",
       addRandomSuffix: false,
       contentType: "text/html",
     });
     order.labelGenerated = true;
-    labels.push(blob.url);
+    labels.push(blob.downloadUrl);
   }
 
   await saveOrders(orders);

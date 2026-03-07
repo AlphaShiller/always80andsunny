@@ -33,13 +33,13 @@ async function readItems(): Promise<InventoryRecord[]> {
       // First time — seed with default products
       const seeded = seedInventory as InventoryRecord[];
       await put(BLOB_KEY, JSON.stringify(seeded, null, 2), {
-        access: "public",
+        access: "private",
         addRandomSuffix: false,
       });
       return seeded;
     }
     // Fetch existing data
-    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    const res = await fetch(blobs[0].downloadUrl, { cache: "no-store" });
     const data = await res.json();
     return data as InventoryRecord[];
   } catch (err) {
@@ -50,7 +50,7 @@ async function readItems(): Promise<InventoryRecord[]> {
 
 async function writeItems(items: InventoryRecord[]) {
   await put(BLOB_KEY, JSON.stringify(items, null, 2), {
-    access: "public",
+    access: "private",
     addRandomSuffix: false,
   });
 }

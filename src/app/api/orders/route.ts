@@ -27,7 +27,7 @@ async function getOrders(): Promise<OrderRecord[]> {
   try {
     const { blobs } = await list({ prefix: ORDERS_BLOB_KEY });
     if (blobs.length === 0) return [];
-    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    const res = await fetch(blobs[0].downloadUrl, { cache: "no-store" });
     return await res.json();
   } catch {
     return [];
@@ -36,7 +36,7 @@ async function getOrders(): Promise<OrderRecord[]> {
 
 async function saveOrders(orders: OrderRecord[]) {
   await put(ORDERS_BLOB_KEY, JSON.stringify(orders, null, 2), {
-    access: "public",
+    access: "private",
     addRandomSuffix: false,
   });
 }
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     try {
       const { blobs } = await list({ prefix: INVENTORY_BLOB_KEY });
       if (blobs.length > 0) {
-        const invRes = await fetch(blobs[0].url, { cache: "no-store" });
+        const invRes = await fetch(blobs[0].downloadUrl, { cache: "no-store" });
         const inventory = await invRes.json();
         let inventoryUpdated = false;
 
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
 
         if (inventoryUpdated) {
           await put(INVENTORY_BLOB_KEY, JSON.stringify(inventory, null, 2), {
-            access: "public",
+            access: "private",
             addRandomSuffix: false,
           });
         }
