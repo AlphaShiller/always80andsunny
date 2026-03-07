@@ -1,42 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { put, list } from "@vercel/blob";
 
-const DATA_DIR = "/tmp/always80-data";
-const POSTS_FILE = path.join(DATA_DIR, "posts.json");
-const NEWSLETTER_FILE = path.join(DATA_DIR, "newsletter-subscribers.json");
+const POSTS_KEY = "posts.json";
+const NEWSLETTER_KEY = "newsletter-subscribers.json";
+const NOTIFICATIONS_KEY = "email-notifications.json";
 
-function ensureDataDir() {
-  const dir = path.dirname(POSTS_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(POSTS_FILE)) fs.writeFileSync(POSTS_FILE, "[]");
-}
-
-function getPosts() {
-  ensureDataDir();
-  return JSON.parse(fs.readFileSync(POSTS_FILE, "utf-8"));
-}
-
-function savePosts(posts: unknown[]) {
-  ensureDataDir();
-  fs.writeFileSync(POSTS_FILE, JSON.stringify(posts, null, 2));
-}
-
-function getSubscribers(): { email: string; subscribedAt: string }[] {
+async function readBlob<T>(key: string, fallback: T): Promise<T> {
   try {
-    if (fs.existsSync(NEWSLETTER_FILE)) {
-      return JSON.parse(fs.readFileSync(NEWSLETTER_FILE, "utf-8"));
-    }
-  } catch { /* ignore */ }
-  return [];
+    const { blobs } = await list({ prefix: key });
+    if (blobs.length === 0) return fallback;
+    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    return await res.json();
+  } catch {
+    return fallback;
+  }
+}
+
+async function writeBlob(key: string, data: unknown) {
+  await put(key, JSON.stringify(data, null, 2), {
+    access: "public",
+    addRandomSuffix: false,
+  });
 }
 
 export async function GET() {
-  const posts = getPosts();
-  // Return sorted newest first
-  posts.sort((a: { createdAt: string }, b: { createdAt: string }) =>
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  const posts = await readBlob<unknown[]>(POSTS_KEY, []);
+  posts.sort((a: unknown, b: unknown) => {
+    const aDate = (a as { createdAt: string }).createdAt;
+    const bDate = (b as { createdAt: string }).createdAt;
+    return new Date(bDate).getTime() - new Date(aDate).getTime();
+  });
   return NextResponse.json({ posts });
 }
 
@@ -61,58 +54,30 @@ export async function POST(req: NextRequest) {
       likes: 0,
     };
 
-    const posts = getPosts();
-    posts.unshift(post); // newest first
-    savePosts(posts);
+    const posts = await readBlob<unknown[]>(POSTS_KEY, []);
+    posts.unshift(post);
+    await writeBlob(POSTS_KEY, posts);
 
     // --- Email notification to newsletter subscribers ---
-    const subscribers = getSubscribers();
+    const subscribers = await readBlob<{ email: string; subscribedAt: string }[]>(NEWSLETTER_KEY, []);
     let emailsSent = 0;
 
     if (subscribers.length > 0) {
-      // Determine which subscribers can see this post based on tier
-      // For "free" tier posts, notify all subscribers
-      // For paid tiers, still notify all — they'll see the teaser and may subscribe
       const tierLabel = tier === "free" ? "Free" : tier;
       const videoLine = videoUrl
         ? `\n\n▶️ This post includes a video — watch it on the Feed!`
         : "";
 
-      const emailPayload = {
-        from: "History Adventures <noreply@always80andsunny.app>",
-        subject: `📚 New Post: ${title}`,
-        html: `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #0B0620; color: #E8E0F0; padding: 32px; border-radius: 12px;">
-            <div style="text-align: center; margin-bottom: 24px;">
-              <img src="https://always80andsunny.app/logo.png" alt="AI Alpha Daily" style="height: 48px;" />
-            </div>
-            <h1 style="color: #FFFFFF; font-size: 22px; margin-bottom: 8px;">${title}</h1>
-            <p style="color: #9B8FB8; font-size: 13px; margin-bottom: 16px;">Access: ${tierLabel} | ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
-            <div style="background: #1A1335; padding: 20px; border-radius: 8px; border: 1px solid #2D2550; margin-bottom: 20px;">
-              <p style="color: #E8E0F0; font-size: 15px; line-height: 1.6; margin: 0;">${postBody.length > 300 ? postBody.slice(0, 300) + "..." : postBody}</p>
-              ${videoLine}
-            </div>
-            <div style="text-align: center;">
-              <a href="https://always80andsunny.app" style="display: inline-block; background: linear-gradient(135deg, #7C3AED, #2DD4BF); color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">View on Always 80 and Sunny →</a>
-            </div>
-            <p style="color: #6B5F84; font-size: 11px; text-align: center; margin-top: 24px;">You're receiving this because you subscribed to the History Adventures newsletter.<br/>To unsubscribe, visit your account settings on Always 80 and Sunny.</p>
-          </div>
-        `,
-      };
-
-      // Log the email that would be sent (in production, integrate with SendGrid/Resend/etc.)
       console.log(`[EMAIL NOTIFICATION] New post "${title}" — notifying ${subscribers.length} subscribers`);
-      console.log(`[EMAIL PAYLOAD]`, JSON.stringify({ ...emailPayload, recipientCount: subscribers.length }, null, 2));
+      console.log(`[EMAIL PAYLOAD]`, JSON.stringify({
+        from: "Always 80 and Sunny <noreply@always80andsunny.app>",
+        subject: `🎣 New Post: ${title}`,
+        tierLabel,
+        videoLine,
+        recipientCount: subscribers.length,
+      }, null, 2));
 
-      // Store notification record for dashboard tracking
-      const notificationsFile = path.join(DATA_DIR, "email-notifications.json");
-      let notifications: unknown[] = [];
-      try {
-        if (fs.existsSync(notificationsFile)) {
-          notifications = JSON.parse(fs.readFileSync(notificationsFile, "utf-8"));
-        }
-      } catch { /* ignore */ }
-
+      const notifications = await readBlob<unknown[]>(NOTIFICATIONS_KEY, []);
       notifications.push({
         id: `notif_${Date.now()}`,
         postId: post.id,
@@ -121,10 +86,9 @@ export async function POST(req: NextRequest) {
         recipientCount: subscribers.length,
         recipients: subscribers.map((s) => s.email),
         sentAt: new Date().toISOString(),
-        status: "queued", // Would be "sent" with a real email provider
+        status: "queued",
       });
-
-      fs.writeFileSync(notificationsFile, JSON.stringify(notifications, null, 2));
+      await writeBlob(NOTIFICATIONS_KEY, notifications);
       emailsSent = subscribers.length;
     }
 

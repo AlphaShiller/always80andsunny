@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { put, list } from "@vercel/blob";
 
-const DATA_DIR = "/tmp/always80-data";
-const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
-const LABELS_DIR = path.join(DATA_DIR, "labels");
-
-function ensureDir(dir: string) {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-}
+const ORDERS_BLOB_KEY = "orders.json";
+const LABELS_BLOB_PREFIX = "labels/";
 
 interface OrderItem {
   name: string;
@@ -31,6 +25,24 @@ interface Order {
   status: string;
   labelGenerated: boolean;
   createdAt: string;
+}
+
+async function getOrders(): Promise<Order[]> {
+  try {
+    const { blobs } = await list({ prefix: ORDERS_BLOB_KEY });
+    if (blobs.length === 0) return [];
+    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
+async function saveOrders(orders: Order[]) {
+  await put(ORDERS_BLOB_KEY, JSON.stringify(orders, null, 2), {
+    access: "public",
+    addRandomSuffix: false,
+  });
 }
 
 // Generate a shipping label as an SVG-based HTML file that can be printed as PDF
@@ -67,12 +79,12 @@ function generateLabelHTML(order: Order): string {
 <body>
   <div class="label">
     <div class="header">
-      <h1>HISTORY ADVENTURES</h1>
-      <p>Always 80 and Sunny Creator Store</p>
+      <h1>ALWAYS 80 AND SUNNY</h1>
+      <p>Custom Baits &amp; Tackle</p>
     </div>
     <div class="from-section">
       <p class="label-text">From</p>
-      <p>History Adventures<br>123 Creator Lane<br>Austin, TX 78701</p>
+      <p>Always 80 and Sunny<br>123 Creator Lane<br>Austin, TX 78701</p>
     </div>
     <div class="to-section">
       <p class="label-text">Ship To</p>
@@ -100,10 +112,7 @@ export async function GET(req: NextRequest) {
 
   // If ?pending=true, return all orders needing labels
   if (pending === "true") {
-    if (!fs.existsSync(ORDERS_FILE)) {
-      return NextResponse.json({ orders: [], labels: [] });
-    }
-    const orders: Order[] = JSON.parse(fs.readFileSync(ORDERS_FILE, "utf-8"));
+    const orders = await getOrders();
     const needsLabel = orders.filter((o: Order) => !o.labelGenerated);
     return NextResponse.json({ orders: needsLabel });
   }
@@ -112,11 +121,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "orderId required" }, { status: 400 });
   }
 
-  if (!fs.existsSync(ORDERS_FILE)) {
-    return NextResponse.json({ error: "No orders found" }, { status: 404 });
-  }
-
-  const orders: Order[] = JSON.parse(fs.readFileSync(ORDERS_FILE, "utf-8"));
+  const orders = await getOrders();
   const order = orders.find((o: Order) => o.id === orderId);
 
   if (!order) {
@@ -126,14 +131,17 @@ export async function GET(req: NextRequest) {
   // Generate HTML label
   const html = generateLabelHTML(order);
 
-  // Save to public/labels for direct access
-  ensureDir(LABELS_DIR);
+  // Save label to Blob for direct access
   const filename = `label-${order.id}.html`;
-  fs.writeFileSync(path.join(LABELS_DIR, filename), html);
+  await put(`${LABELS_BLOB_PREFIX}${filename}`, html, {
+    access: "public",
+    addRandomSuffix: false,
+    contentType: "text/html",
+  });
 
   // Mark as generated
   order.labelGenerated = true;
-  fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
+  await saveOrders(orders);
 
   return new NextResponse(html, {
     headers: { "Content-Type": "text/html" },
@@ -142,25 +150,24 @@ export async function GET(req: NextRequest) {
 
 // POST: Generate labels for all pending orders
 export async function POST() {
-  if (!fs.existsSync(ORDERS_FILE)) {
-    return NextResponse.json({ labels: [] });
-  }
-
-  const orders: Order[] = JSON.parse(fs.readFileSync(ORDERS_FILE, "utf-8"));
-  const pending = orders.filter((o: Order) => !o.labelGenerated);
-  ensureDir(LABELS_DIR);
+  const orders = await getOrders();
+  const pendingOrders = orders.filter((o: Order) => !o.labelGenerated);
 
   const labels: string[] = [];
 
-  for (const order of pending) {
+  for (const order of pendingOrders) {
     const html = generateLabelHTML(order);
     const filename = `label-${order.id}.html`;
-    fs.writeFileSync(path.join(LABELS_DIR, filename), html);
+    const blob = await put(`${LABELS_BLOB_PREFIX}${filename}`, html, {
+      access: "public",
+      addRandomSuffix: false,
+      contentType: "text/html",
+    });
     order.labelGenerated = true;
-    labels.push(`/labels/${filename}`);
+    labels.push(blob.url);
   }
 
-  fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
+  await saveOrders(orders);
 
   return NextResponse.json({
     generated: labels.length,

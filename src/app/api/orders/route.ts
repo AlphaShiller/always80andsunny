@@ -1,16 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { put, list } from "@vercel/blob";
 
-const DATA_DIR = "/tmp/always80-data";
-const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
-const INVENTORY_FILE = path.join(DATA_DIR, "inventory.json");
-
-function ensureDataDir() {
-  const dir = path.dirname(ORDERS_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(ORDERS_FILE)) fs.writeFileSync(ORDERS_FILE, "[]");
-}
+const ORDERS_BLOB_KEY = "orders.json";
+const INVENTORY_BLOB_KEY = "inventory.json";
 
 interface OrderRecord {
   id: string;
@@ -31,18 +23,26 @@ interface OrderRecord {
   notes?: string;
 }
 
-function getOrders(): OrderRecord[] {
-  ensureDataDir();
-  return JSON.parse(fs.readFileSync(ORDERS_FILE, "utf-8"));
+async function getOrders(): Promise<OrderRecord[]> {
+  try {
+    const { blobs } = await list({ prefix: ORDERS_BLOB_KEY });
+    if (blobs.length === 0) return [];
+    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    return await res.json();
+  } catch {
+    return [];
+  }
 }
 
-function saveOrders(orders: OrderRecord[]) {
-  ensureDataDir();
-  fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
+async function saveOrders(orders: OrderRecord[]) {
+  await put(ORDERS_BLOB_KEY, JSON.stringify(orders, null, 2), {
+    access: "public",
+    addRandomSuffix: false,
+  });
 }
 
 export async function GET() {
-  const orders = getOrders();
+  const orders = await getOrders();
   return NextResponse.json({ orders });
 }
 
@@ -65,7 +65,6 @@ export async function POST(req: NextRequest) {
       status: "confirmed",
       labelGenerated: false,
       createdAt: new Date().toISOString(),
-      // Initialize shipment fields
       weight: "",
       dimensions: "",
       requirements: "",
@@ -74,15 +73,16 @@ export async function POST(req: NextRequest) {
       notes: "",
     };
 
-    const orders = getOrders();
+    const orders = await getOrders();
     orders.push(order);
-    saveOrders(orders);
+    await saveOrders(orders);
 
     // Deduct purchased quantities from inventory
     try {
-      if (fs.existsSync(INVENTORY_FILE)) {
-        const invRaw = fs.readFileSync(INVENTORY_FILE, "utf-8");
-        const inventory = JSON.parse(invRaw);
+      const { blobs } = await list({ prefix: INVENTORY_BLOB_KEY });
+      if (blobs.length > 0) {
+        const invRes = await fetch(blobs[0].url, { cache: "no-store" });
+        const inventory = await invRes.json();
         let inventoryUpdated = false;
 
         for (const orderItem of items) {
@@ -92,7 +92,6 @@ export async function POST(req: NextRequest) {
             const currentQty = inventory[invIdx].quantity || 0;
             inventory[invIdx].quantity = Math.max(0, currentQty - (orderItem.quantity || 1));
             inventory[invIdx].updatedAt = new Date().toISOString();
-            // Auto-set to out_of_stock if quantity hits 0
             if (inventory[invIdx].quantity === 0) {
               inventory[invIdx].status = "out_of_stock";
             }
@@ -101,12 +100,14 @@ export async function POST(req: NextRequest) {
         }
 
         if (inventoryUpdated) {
-          fs.writeFileSync(INVENTORY_FILE, JSON.stringify(inventory, null, 2));
+          await put(INVENTORY_BLOB_KEY, JSON.stringify(inventory, null, 2), {
+            access: "public",
+            addRandomSuffix: false,
+          });
         }
       }
     } catch (invErr) {
       console.error("Failed to update inventory quantities:", invErr);
-      // Order still succeeds even if inventory deduction fails
     }
 
     return NextResponse.json({ order });
@@ -126,7 +127,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const allowedFields = ["weight", "dimensions", "requirements", "shipmentStatus", "trackingNumber", "notes"];
-    const orders = getOrders();
+    const orders = await getOrders();
     const idx = orders.findIndex((o) => o.id === orderId);
 
     if (idx === -1) {
@@ -145,7 +146,7 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
-    saveOrders(orders);
+    await saveOrders(orders);
     return NextResponse.json({ order: orders[idx] });
   } catch {
     return NextResponse.json({ error: "Failed to update order" }, { status: 500 });

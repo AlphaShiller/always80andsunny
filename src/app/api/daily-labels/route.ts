@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { put, list } from "@vercel/blob";
 
-const DATA_DIR = "/tmp/always80-data";
-const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
-const LABELS_DIR = path.join(DATA_DIR, "labels");
+const ORDERS_BLOB_KEY = "orders.json";
 
 interface OrderItem {
   name: string;
@@ -23,25 +20,29 @@ interface Order {
   createdAt: string;
 }
 
+async function getOrders(): Promise<Order[]> {
+  try {
+    const { blobs } = await list({ prefix: ORDERS_BLOB_KEY });
+    if (blobs.length === 0) return [];
+    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
 // This endpoint generates all pending labels and returns a summary page
 // It's designed to be called by a daily cron job / scheduled task
 export async function GET() {
-  if (!fs.existsSync(ORDERS_FILE)) {
-    return NextResponse.json({ message: "No orders yet", labels: [] });
-  }
-
-  const orders: Order[] = JSON.parse(fs.readFileSync(ORDERS_FILE, "utf-8"));
+  const orders = await getOrders();
 
   // Get today's orders (or all pending)
   const today = new Date().toISOString().split("T")[0];
   const todaysOrders = orders.filter((o: Order) => o.createdAt.startsWith(today));
   const pendingLabels = orders.filter((o: Order) => !o.labelGenerated);
 
-  // Ensure labels directory exists
-  if (!fs.existsSync(LABELS_DIR)) fs.mkdirSync(LABELS_DIR, { recursive: true });
-
   // Generate a summary HTML page with links to all pending labels
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://always80-app.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://always80andsunny-r45j.vercel.app";
   const summaryHTML = `<!DOCTYPE html>
 <html>
 <head>
@@ -85,20 +86,24 @@ export async function GET() {
     <a class="label-link" href="${appUrl}/api/shipping-label?orderId=${order.id}" target="_blank">Print Shipping Label</a>
   </div>`).join("")}
 
-  <div class="footer">Always 80 and Sunny — History Adventures | Generated at ${new Date().toLocaleTimeString()}</div>
+  <div class="footer">Always 80 and Sunny — Custom Baits & Tackle | Generated at ${new Date().toLocaleTimeString()}</div>
 </body>
 </html>`;
 
-  // Save the daily summary page
+  // Save the daily summary page to Blob
   const summaryFilename = `daily-summary-${today}.html`;
-  fs.writeFileSync(path.join(LABELS_DIR, summaryFilename), summaryHTML);
+  const summaryBlob = await put(`labels/${summaryFilename}`, summaryHTML, {
+    access: "public",
+    addRandomSuffix: false,
+    contentType: "text/html",
+  });
 
   return NextResponse.json({
     date: today,
     totalOrders: orders.length,
     todaysOrders: todaysOrders.length,
     pendingLabels: pendingLabels.length,
-    summaryUrl: `${appUrl}/labels/${summaryFilename}`,
+    summaryUrl: summaryBlob.url,
     labelLinks: pendingLabels.map((o: Order) => ({
       orderId: o.id,
       customer: o.shipping.name,

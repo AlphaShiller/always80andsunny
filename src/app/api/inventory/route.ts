@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { put, list } from "@vercel/blob";
 import seedInventory from "@/data/seed-inventory.json";
 
-const DATA_DIR = "/tmp/always80-data";
-const INVENTORY_FILE = path.join(DATA_DIR, "inventory.json");
-
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(INVENTORY_FILE)) {
-    // Seed with default products on first cold start
-    fs.writeFileSync(INVENTORY_FILE, JSON.stringify(seedInventory, null, 2));
-  }
-}
+const BLOB_KEY = "inventory.json";
 
 interface InventoryRecord {
   id: string;
@@ -35,21 +25,40 @@ interface InventoryRecord {
   updatedAt: string;
 }
 
-function readItems(): InventoryRecord[] {
-  ensureDataDir();
-  const raw = fs.readFileSync(INVENTORY_FILE, "utf-8");
-  return JSON.parse(raw);
+async function readItems(): Promise<InventoryRecord[]> {
+  try {
+    // Check if inventory blob exists
+    const { blobs } = await list({ prefix: BLOB_KEY });
+    if (blobs.length === 0) {
+      // First time — seed with default products
+      const seeded = seedInventory as InventoryRecord[];
+      await put(BLOB_KEY, JSON.stringify(seeded, null, 2), {
+        access: "public",
+        addRandomSuffix: false,
+      });
+      return seeded;
+    }
+    // Fetch existing data
+    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    const data = await res.json();
+    return data as InventoryRecord[];
+  } catch (err) {
+    console.error("readItems error:", err);
+    return [];
+  }
 }
 
-function writeItems(items: InventoryRecord[]) {
-  ensureDataDir();
-  fs.writeFileSync(INVENTORY_FILE, JSON.stringify(items, null, 2));
+async function writeItems(items: InventoryRecord[]) {
+  await put(BLOB_KEY, JSON.stringify(items, null, 2), {
+    access: "public",
+    addRandomSuffix: false,
+  });
 }
 
 // GET — list all inventory items
 export async function GET() {
   try {
-    const items = readItems();
+    const items = await readItems();
     return NextResponse.json({ items });
   } catch {
     return NextResponse.json({ items: [] });
@@ -60,7 +69,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const items = readItems();
+    const items = await readItems();
 
     const newItem: InventoryRecord = {
       id: `INV-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -84,7 +93,7 @@ export async function POST(req: NextRequest) {
     };
 
     items.push(newItem);
-    writeItems(items);
+    await writeItems(items);
 
     return NextResponse.json({ item: newItem });
   } catch (err) {
@@ -103,7 +112,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "itemId required" }, { status: 400 });
     }
 
-    const items = readItems();
+    const items = await readItems();
     const idx = items.findIndex((i) => i.id === itemId);
     if (idx === -1) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
@@ -123,7 +132,7 @@ export async function PATCH(req: NextRequest) {
     }
     items[idx].updatedAt = new Date().toISOString();
 
-    writeItems(items);
+    await writeItems(items);
     return NextResponse.json({ item: items[idx] });
   } catch (err) {
     console.error("Inventory PATCH error:", err);
@@ -141,9 +150,9 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "itemId required" }, { status: 400 });
     }
 
-    let items = readItems();
+    let items = await readItems();
     items = items.filter((i) => i.id !== itemId);
-    writeItems(items);
+    await writeItems(items);
 
     return NextResponse.json({ success: true });
   } catch (err) {

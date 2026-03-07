@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { put, list } from "@vercel/blob";
 
-const DATA_DIR = "/tmp/always80-data";
-const BOOKINGS_FILE = path.join(DATA_DIR, "charter-bookings.json");
-
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(BOOKINGS_FILE)) fs.writeFileSync(BOOKINGS_FILE, "[]");
-}
+const BLOB_KEY = "charter-bookings.json";
 
 interface Booking {
   id: string;
@@ -26,18 +19,26 @@ interface Booking {
   createdAt: string;
 }
 
-function getBookings(): Booking[] {
-  ensureDataDir();
-  return JSON.parse(fs.readFileSync(BOOKINGS_FILE, "utf-8"));
+async function getBookings(): Promise<Booking[]> {
+  try {
+    const { blobs } = await list({ prefix: BLOB_KEY });
+    if (blobs.length === 0) return [];
+    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    return await res.json();
+  } catch {
+    return [];
+  }
 }
 
-function saveBookings(bookings: Booking[]) {
-  ensureDataDir();
-  fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(bookings, null, 2));
+async function saveBookings(bookings: Booking[]) {
+  await put(BLOB_KEY, JSON.stringify(bookings, null, 2), {
+    access: "public",
+    addRandomSuffix: false,
+  });
 }
 
 export async function GET() {
-  const bookings = getBookings();
+  const bookings = await getBookings();
   return NextResponse.json({ bookings });
 }
 
@@ -66,9 +67,9 @@ export async function POST(req: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    const bookings = getBookings();
+    const bookings = await getBookings();
     bookings.push(booking);
-    saveBookings(bookings);
+    await saveBookings(bookings);
 
     return NextResponse.json({ booking });
   } catch {
@@ -85,7 +86,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "bookingId required" }, { status: 400 });
     }
 
-    const bookings = getBookings();
+    const bookings = await getBookings();
     const idx = bookings.findIndex((b) => b.id === bookingId);
     if (idx === -1) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
@@ -94,7 +95,7 @@ export async function PATCH(req: NextRequest) {
     if (status) bookings[idx].status = status;
     if (notes !== undefined) bookings[idx].notes = notes;
 
-    saveBookings(bookings);
+    await saveBookings(bookings);
     return NextResponse.json({ booking: bookings[idx] });
   } catch {
     return NextResponse.json({ error: "Failed to update booking" }, { status: 500 });

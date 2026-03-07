@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { put, list } from "@vercel/blob";
 
-const DATA_DIR = "/tmp/always80-data";
-const SUBSCRIBERS_FILE = path.join(DATA_DIR, "newsletter-subscribers.json");
-
-function ensureDataDir() {
-  const dir = path.dirname(SUBSCRIBERS_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(SUBSCRIBERS_FILE)) fs.writeFileSync(SUBSCRIBERS_FILE, "[]");
-}
+const BLOB_KEY = "newsletter-subscribers.json";
 
 interface Subscriber {
   email: string;
@@ -17,18 +9,26 @@ interface Subscriber {
   subscribedAt: string;
 }
 
-function getSubscribers(): Subscriber[] {
-  ensureDataDir();
-  return JSON.parse(fs.readFileSync(SUBSCRIBERS_FILE, "utf-8"));
+async function getSubscribers(): Promise<Subscriber[]> {
+  try {
+    const { blobs } = await list({ prefix: BLOB_KEY });
+    if (blobs.length === 0) return [];
+    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    return await res.json();
+  } catch {
+    return [];
+  }
 }
 
-function saveSubscribers(subs: Subscriber[]) {
-  ensureDataDir();
-  fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(subs, null, 2));
+async function saveSubscribers(subs: Subscriber[]) {
+  await put(BLOB_KEY, JSON.stringify(subs, null, 2), {
+    access: "public",
+    addRandomSuffix: false,
+  });
 }
 
 export async function GET() {
-  const subscribers = getSubscribers();
+  const subscribers = await getSubscribers();
   return NextResponse.json({ count: subscribers.length, subscribers });
 }
 
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Valid email required" }, { status: 400 });
     }
 
-    const subscribers = getSubscribers();
+    const subscribers = await getSubscribers();
 
     // Check for duplicate
     if (subscribers.some((s: Subscriber) => s.email.toLowerCase() === email.toLowerCase())) {
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       subscribedAt: new Date().toISOString(),
     });
 
-    saveSubscribers(subscribers);
+    await saveSubscribers(subscribers);
 
     return NextResponse.json({ message: "Successfully subscribed!", count: subscribers.length });
   } catch {
