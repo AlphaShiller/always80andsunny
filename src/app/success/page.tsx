@@ -5,12 +5,12 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { TierName, TIER_ORDER } from "@/types";
 
 const COLORS = {
-  darkBg: "#0F0A1E",
-  purple: "#9945FF",
-  teal: "#14F195",
-  cardBg: "#1A1333",
-  lightText: "#B8B8D0",
-  midGray: "#6B6B8D",
+  darkBg: "#0A1628",
+  purple: "#D97706",
+  teal: "#0EA5E9",
+  cardBg: "#111D32",
+  lightText: "#C8D6E5",
+  midGray: "#64748B",
 };
 
 function SuccessContent() {
@@ -30,9 +30,9 @@ function SuccessContent() {
           subscribedAt: new Date().toISOString(),
           paymentMethod: "stripe",
         };
-        localStorage.setItem(`solgate_sub_email_${email}`, JSON.stringify(data));
+        localStorage.setItem(`always80_sub_email_${email}`, JSON.stringify(data));
         // Also save the email so main app can check it
-        localStorage.setItem("solgate_stripe_email", email);
+        localStorage.setItem("always80_stripe_email", email);
         setSaved(true);
       } catch {
         // localStorage unavailable

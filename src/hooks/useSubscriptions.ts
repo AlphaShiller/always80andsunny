@@ -40,7 +40,7 @@ function getHigherTier(a: TierName | null, b: TierName | null): TierName | null 
 function getStripeEmail(): string | null {
   if (typeof window === "undefined") return null;
   try {
-    return localStorage.getItem("solgate_stripe_email");
+    return localStorage.getItem("always80_stripe_email");
   } catch {
     return null;
   }
@@ -56,7 +56,7 @@ export function useSubscriptions(walletAddress: string | null) {
 
     // Check wallet-based subscription
     if (walletAddress) {
-      const walletSub = loadSub(`solgate_sub_${walletAddress}`);
+      const walletSub = loadSub(`always80_sub_${walletAddress}`);
       if (walletSub) best = getHigherTier(best, walletSub.tier);
     }
 
@@ -64,7 +64,7 @@ export function useSubscriptions(walletAddress: string | null) {
     const email = getStripeEmail();
     if (email) {
       setStripeEmail(email);
-      const emailSub = loadSub(`solgate_sub_email_${email}`);
+      const emailSub = loadSub(`always80_sub_email_${email}`);
       if (emailSub) best = getHigherTier(best, emailSub.tier);
     }
 
@@ -87,7 +87,7 @@ export function useSubscriptions(walletAddress: string | null) {
         subscribedAt: new Date().toISOString(),
         paymentMethod: "solana",
       };
-      saveSub(`solgate_sub_${walletAddress}`, data);
+      saveSub(`always80_sub_${walletAddress}`, data);
       setSubscribedTier(tierName);
     },
     [walletAddress, subscribedTier]
@@ -98,7 +98,7 @@ export function useSubscriptions(walletAddress: string | null) {
     const email = getStripeEmail();
     if (!email) return;
     setStripeEmail(email);
-    const emailSub = loadSub(`solgate_sub_email_${email}`);
+    const emailSub = loadSub(`always80_sub_email_${email}`);
     if (emailSub) {
       const best = getHigherTier(subscribedTier, emailSub.tier);
       setSubscribedTier(best);

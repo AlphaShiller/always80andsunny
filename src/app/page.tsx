@@ -54,7 +54,7 @@ const INITIAL_POSTS: Post[] = [
     id: "post1",
     creatorId: 1,
     title: "Welcome! Check Out Our New Custom Swimbaits",
-    body: "Hey anglers! I'm thrilled to launch Always 80 and Sunny on SolGate. We're bringing you premium custom baits, tackle, and unforgettable fishing charters. Here's a free preview of our newest swimbait collection — hand-painted in exclusive colors you won't find anywhere else. Check out our shop and join the crew!",
+    body: "Hey anglers! I'm thrilled to launch Always 80 and Sunny. We're bringing you premium custom baits, tackle, and unforgettable fishing charters. Here's a free preview of our newest swimbait collection — hand-painted in exclusive colors you won't find anywhere else. Check out our shop and join the crew!",
     tier: "free",
     createdAt: "2026-03-06T10:00:00Z",
     likes: 312,
@@ -436,7 +436,7 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
   const [newsletterCount, setNewsletterCount] = useState<number | null>(null);
   const [orderStats, setOrderStats] = useState<{ total: number; pending: number; revenue: number } | null>(null);
 
-  const generateBlink = () => { setBlinkUrl("solgate.io/pay/history-adventures/complete-bundle"); };
+  const generateBlink = () => { setBlinkUrl("always80andsunny.io/pay/tackle-bundle"); };
 
   const fetchBalance = useCallback(async () => {
     if (publicKey) {
@@ -1026,7 +1026,7 @@ function NewsletterSection() {
 
 // --- Main App ---
 
-function SolGateAppInner() {
+function Always80AppInner() {
   const [view, setView] = useState<"storefront" | "videos" | "feed" | "dashboard" | "shipments">("storefront");
   const [purchases, setPurchases] = useState<{ id: string; signature?: string }[]>([]);
   const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
@@ -1494,10 +1494,10 @@ function SolGateAppInner() {
   );
 }
 
-export default function SolGateApp() {
+export default function Always80App() {
   return (
     <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: COLORS.darkBg }} />}>
-      <SolGateAppInner />
+      <Always80AppInner />
     </Suspense>
   );
 }

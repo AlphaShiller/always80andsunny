@@ -16,7 +16,7 @@ export default function ChatWidget() {
       id: "welcome",
       role: "assistant",
       content:
-        "Yo! I'm Sol, your SolGate sidekick. Need help with subscriptions, payments, or want to brainstorm some killer content ideas? I'm here and I don't take coffee breaks. What's up?",
+        "Hey there! I'm Sunny, your Always 80 and Sunny fishing buddy. Need help with baits, tackle, charters, or subscriptions? I'm here and the fish are always biting. What can I help you with?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -180,7 +180,7 @@ export default function ChatWidget() {
             AI
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">SolGate Assistant</p>
+            <p className="text-sm font-semibold text-white">Always 80 Assistant</p>
             <p className="text-xs" style={{ color: COLORS.teal }}>
               Online
             </p>
