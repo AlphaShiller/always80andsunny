@@ -1131,9 +1131,9 @@ function Always80AppInner() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: COLORS.darkBg }}>
       {/* Nav — sticky */}
-      <nav className="border-b px-4 sm:px-6 py-2 flex items-center justify-between sticky top-0 z-40" style={{ borderColor: "#2D2550", backgroundColor: COLORS.darkBg }}>
+      <nav className="border-b px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40" style={{ borderColor: "#2D2550", backgroundColor: COLORS.darkBg }}>
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Always 80 and Sunny" className="h-10 w-auto rounded-lg" />
+          <img src="/logo.png" alt="Always 80 and Sunny" className="h-16 w-auto rounded-lg" />
           <div className="hidden sm:flex items-center gap-2">
             <span className="text-white font-bold text-lg">Always 80</span>
             <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#0D3B2E", color: COLORS.teal }}>DEVNET</span>
