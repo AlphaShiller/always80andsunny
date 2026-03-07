@@ -24,13 +24,13 @@ import {
 } from "@solana/web3.js";
 
 // Creator's wallet address (your Phantom devnet wallet)
-const CREATOR_WALLET = new PublicKey("5rnPZyuzwWYaHz3RgH8ZfTdSX4sjaCHPBWbXxpA4wkMX");
+const CREATOR_WALLET = new PublicKey("2vz5o83UJk8q36rzNe7BSJ8wL1hQTjwMsB7WRYw6PD3g");
 
 // YouTube channel config — replace YOUTUBE_CHANNEL_ID with your actual UC... channel ID
 // Find it at: youtube.com/@Always80andSunny → click About → Share Channel → Copy Channel ID
 const YOUTUBE_CHANNEL_ID = "";
 const YOUTUBE_HANDLE = "";
-const PLATFORM_FEE_WALLET = new PublicKey("5rnPZyuzwWYaHz3RgH8ZfTdSX4sjaCHPBWbXxpA4wkMX");
+const PLATFORM_FEE_WALLET = new PublicKey("2vz5o83UJk8q36rzNe7BSJ8wL1hQTjwMsB7WRYw6PD3g");
 
 interface Product {
   id?: string;
