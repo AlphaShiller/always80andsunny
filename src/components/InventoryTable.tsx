@@ -148,7 +148,7 @@ export default function InventoryTable() {
 
   const handleKeyDown = (e: React.KeyboardEvent, itemId: string, field: string) => {
     if (e.key === "Enter") {
-      const numericFields = ["quantity", "price", "priceSol"];
+      const numericFields = ["quantity", "cost", "price", "priceSol"];
       const val = numericFields.includes(field) ? parseFloat(editValue) || 0 : editValue;
       updateField(itemId, field, val);
     } else if (e.key === "Escape") {
@@ -222,7 +222,7 @@ export default function InventoryTable() {
             onChange={(e) => setEditValue(e.target.value)}
             onKeyDown={(e) => handleKeyDown(e, item.id, field)}
             onBlur={() => {
-              const numericFields = ["quantity", "price", "priceSol"];
+              const numericFields = ["quantity", "cost", "price", "priceSol"];
               const val = numericFields.includes(field) ? parseFloat(editValue) || 0 : editValue;
               updateField(item.id, field, val);
             }}
