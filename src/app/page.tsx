@@ -1131,13 +1131,13 @@ function Always80AppInner() {
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: COLORS.darkBg }}>
       {/* Full-page watermark */}
-      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none" style={{ opacity: 0.04 }}>
-        <img src="/logo.png" alt="" className="w-[80vmin] h-[80vmin] object-contain" />
+      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none" style={{ opacity: 0.07 }}>
+        <img src="/logo.png" alt="" className="w-[112vmin] h-[112vmin] object-contain" />
       </div>
       {/* Nav — sticky */}
       <nav className="border-b px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40" style={{ borderColor: "#2D2550", backgroundColor: COLORS.darkBg }}>
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Always 80 and Sunny" className="h-16 w-auto rounded-lg" />
+          <img src="/logo.png" alt="Always 80 and Sunny" className="h-[90px] w-auto rounded-lg" />
           <div className="hidden sm:flex items-center gap-2">
             <span className="text-white font-bold text-lg">Always 80</span>
             <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#0D3B2E", color: COLORS.teal }}>DEVNET</span>
