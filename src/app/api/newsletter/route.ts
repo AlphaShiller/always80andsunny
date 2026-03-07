@@ -22,7 +22,7 @@ async function getSubscribers(): Promise<Subscriber[]> {
 
 async function saveSubscribers(subs: Subscriber[]) {
   await put(BLOB_KEY, JSON.stringify(subs, null, 2), {
-    access: "private",
+    access: "public",
     addRandomSuffix: false,
   });
 }
