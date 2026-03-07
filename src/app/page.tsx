@@ -7,6 +7,7 @@ import { WalletModal, WalletModalButton, useWalletModal } from "@/components/Wal
 import PostFeed from "@/components/PostFeed";
 import CreatePostForm from "@/components/CreatePostForm";
 import ShipmentsTable from "@/components/ShipmentsTable";
+import InventoryTable from "@/components/InventoryTable";
 import CharterBooking from "@/components/CharterBooking";
 import { useSubscriptions } from "@/hooks/useSubscriptions";
 import { COLORS } from "@/utils/colors";
@@ -1110,7 +1111,7 @@ function NewsletterSection() {
 
 // --- Main App ---
 
-type ViewKey = "storefront" | "videos" | "feed" | "charters" | "dashboard" | "shipments";
+type ViewKey = "storefront" | "videos" | "feed" | "charters" | "dashboard" | "shipments" | "inventory";
 
 function Always80AppInner() {
   const [view, setView] = useState<ViewKey>("storefront");
@@ -1160,7 +1161,7 @@ function Always80AppInner() {
   // If wallet disconnects or changes away from owner, redirect off dashboard
   useEffect(() => {
     const ownerConnected = publicKey && publicKey.toBase58() === CREATOR_WALLET.toBase58();
-    if ((view === "dashboard" || view === "shipments") && !ownerConnected) {
+    if ((view === "dashboard" || view === "shipments" || view === "inventory") && !ownerConnected) {
       setView("storefront");
     }
   }, [publicKey, view]);
@@ -1208,6 +1209,7 @@ function Always80AppInner() {
     { key: "videos", label: "Videos" },
     { key: "feed", label: "Feed" },
     { key: "charters", label: "Charters" },
+    { key: "inventory", label: "Inventory", ownerOnly: true },
     { key: "shipments", label: "Shipments", ownerOnly: true },
     { key: "dashboard", label: "Dashboard", ownerOnly: true },
   ];
@@ -1744,6 +1746,10 @@ function Always80AppInner() {
 
         {view === "charters" && (
           <CharterBooking />
+        )}
+
+        {view === "inventory" && isOwner && (
+          <InventoryTable />
         )}
 
         {view === "shipments" && isOwner && (

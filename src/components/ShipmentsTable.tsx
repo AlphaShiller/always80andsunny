@@ -28,10 +28,10 @@ interface Order {
 const SHIPMENT_STATUSES = ["Pending", "Packaged", "Shipped", "Delivered"];
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  Pending: { bg: "#4C1D15", text: "#FCA5A5" },
-  Packaged: { bg: "#3B2F08", text: "#FDE68A" },
-  Shipped: { bg: "#0C2D48", text: "#93C5FD" },
-  Delivered: { bg: "#0D3B2E", text: "#6EE7B7" },
+  Pending: { bg: "#FEE2E2", text: "#991B1B" },
+  Packaged: { bg: "#FEF3C7", text: "#92400E" },
+  Shipped: { bg: "#DBEAFE", text: "#1E40AF" },
+  Delivered: { bg: "#D1FAE5", text: "#065F46" },
 };
 
 export default function ShipmentsTable() {
@@ -48,7 +48,6 @@ export default function ShipmentsTable() {
       const res = await fetch("/api/orders");
       const data = await res.json();
       if (data.orders) {
-        // Sort newest first
         const sorted = data.orders.sort(
           (a: Order, b: Order) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
@@ -108,8 +107,8 @@ export default function ShipmentsTable() {
       .map((i) => `${i.name}${i.size ? ` (${i.size})` : ""} ×${i.quantity}`)
       .join(", ");
   };
+  void formatItems;
 
-  // Filter and search
   const filtered = orders.filter((o) => {
     const statusMatch = filterStatus === "all" || (o.shipmentStatus || "Pending") === filterStatus;
     const searchMatch =
@@ -130,7 +129,7 @@ export default function ShipmentsTable() {
 
   const cellStyle = {
     padding: "10px 12px",
-    borderBottom: "1px solid #2D2550",
+    borderBottom: "1px solid #E2E8F0",
     fontSize: "13px",
     color: COLORS.lightText,
     whiteSpace: "nowrap" as const,
@@ -145,15 +144,10 @@ export default function ShipmentsTable() {
     fontSize: "11px",
     textTransform: "uppercase" as const,
     letterSpacing: "0.05em",
-    backgroundColor: "#150F28",
+    backgroundColor: "#F1F5F9",
     position: "sticky" as const,
     top: 0,
     zIndex: 2,
-  };
-
-  const editableCellBase = {
-    cursor: "pointer",
-    transition: "background-color 0.15s",
   };
 
   const renderEditableCell = (
@@ -178,9 +172,9 @@ export default function ShipmentsTable() {
             autoFocus
             className="w-full rounded px-2 py-1.5 text-xs outline-none"
             style={{
-              backgroundColor: "#0B0620",
-              color: "white",
-              border: `1px solid ${COLORS.purple}`,
+              backgroundColor: "white",
+              color: "#0A1628",
+              border: `2px solid ${COLORS.teal}`,
             }}
             placeholder={placeholder}
           />
@@ -190,14 +184,14 @@ export default function ShipmentsTable() {
 
     return (
       <td
-        style={{ ...cellStyle, ...editableCellBase, minWidth: width, opacity: isSaving ? 0.5 : 1 }}
+        style={{ ...cellStyle, cursor: "pointer", minWidth: width, opacity: isSaving ? 0.5 : 1 }}
         onClick={() => startEdit(order.id, field, value)}
         title={`Click to edit — ${value || placeholder}`}
       >
         {value ? (
-          <span className="text-white">{value}</span>
+          <span style={{ color: "#0A1628" }}>{value}</span>
         ) : (
-          <span style={{ color: "#4A3D6B", fontStyle: "italic" }}>{placeholder}</span>
+          <span style={{ color: "#94A3B8", fontStyle: "italic" }}>{placeholder}</span>
         )}
       </td>
     );
@@ -209,11 +203,9 @@ export default function ShipmentsTable() {
         <div className="text-center">
           <div
             className="w-8 h-8 border-2 rounded-full animate-spin mx-auto mb-3"
-            style={{ borderColor: "#2D2550", borderTopColor: COLORS.purple }}
+            style={{ borderColor: "#CBD5E1", borderTopColor: COLORS.teal }}
           />
-          <p className="text-sm" style={{ color: COLORS.midGray }}>
-            Loading shipments...
-          </p>
+          <p className="text-sm" style={{ color: COLORS.midGray }}>Loading shipments...</p>
         </div>
       </div>
     );
@@ -224,30 +216,28 @@ export default function ShipmentsTable() {
       {/* Header row */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-black text-white">Shipments</h2>
+          <h2 className="text-2xl font-black" style={{ color: "#0A1628" }}>Shipments</h2>
           <p className="text-xs mt-1" style={{ color: COLORS.midGray }}>
             {orders.length} total order{orders.length !== 1 ? "s" : ""} — click any cell to edit
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search orders..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="rounded-lg px-3 py-1.5 text-xs outline-none w-48"
-              style={{
-                backgroundColor: "#150F28",
-                color: COLORS.lightText,
-                border: "1px solid #2D2550",
-              }}
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Search orders..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="rounded-lg px-3 py-1.5 text-xs outline-none w-48"
+            style={{
+              backgroundColor: "#F1F5F9",
+              color: COLORS.lightText,
+              border: "1px solid #CBD5E1",
+            }}
+          />
           <button
             onClick={fetchOrders}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer hover:opacity-80"
-            style={{ backgroundColor: "#2D2550", color: COLORS.lightText }}
+            style={{ backgroundColor: "#E2E8F0", color: COLORS.lightText }}
           >
             Refresh
           </button>
@@ -267,10 +257,10 @@ export default function ShipmentsTable() {
               className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all"
               style={{
                 backgroundColor: isActive
-                  ? colors?.bg || COLORS.purple
-                  : "#150F28",
+                  ? colors?.bg || COLORS.teal
+                  : "#F1F5F9",
                 color: isActive ? colors?.text || "white" : COLORS.midGray,
-                border: `1px solid ${isActive ? (colors?.text || COLORS.purple) + "40" : "#2D2550"}`,
+                border: `1px solid ${isActive ? (colors?.text || COLORS.teal) + "40" : "#CBD5E1"}`,
               }}
             >
               {status === "all" ? "All" : status} ({count})
@@ -281,8 +271,8 @@ export default function ShipmentsTable() {
 
       {/* Spreadsheet table */}
       <div
-        className="rounded-xl border overflow-hidden"
-        style={{ borderColor: "#2D2550", backgroundColor: COLORS.cardBg }}
+        className="rounded-xl border overflow-hidden shadow-sm"
+        style={{ borderColor: "#CBD5E1", backgroundColor: "white" }}
       >
         <div className="overflow-x-auto" style={{ maxHeight: "calc(100vh - 300px)" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "1200px" }}>
@@ -308,7 +298,7 @@ export default function ShipmentsTable() {
                       <p className="text-lg mb-1" style={{ color: COLORS.midGray }}>
                         {orders.length === 0 ? "No orders yet" : "No matching orders"}
                       </p>
-                      <p className="text-xs" style={{ color: "#4A3D6B" }}>
+                      <p className="text-xs" style={{ color: "#94A3B8" }}>
                         {orders.length === 0
                           ? "Orders will appear here automatically when customers purchase merchandise"
                           : "Try adjusting your search or filter"}
@@ -326,47 +316,44 @@ export default function ShipmentsTable() {
                     <tr
                       key={order.id}
                       style={{
-                        backgroundColor: isSaving ? "#1A1335" : "transparent",
+                        backgroundColor: isSaving ? "#F8FAFC" : "transparent",
                         transition: "background-color 0.2s",
                       }}
                       onMouseEnter={(e) => {
                         if (!isSaving)
-                          (e.currentTarget as HTMLElement).style.backgroundColor = "#120E24";
+                          (e.currentTarget as HTMLElement).style.backgroundColor = "#F8FAFC";
                       }}
                       onMouseLeave={(e) => {
                         if (!isSaving)
                           (e.currentTarget as HTMLElement).style.backgroundColor = "transparent";
                       }}
                     >
-                      {/* Recipient */}
                       <td style={{ ...cellStyle, minWidth: "140px" }}>
                         <div>
-                          <p className="font-semibold text-white text-xs">{order.shipping.name}</p>
-                          <p className="text-xs truncate" style={{ color: "#6B5F84", maxWidth: "130px" }}>
+                          <p className="font-semibold text-xs" style={{ color: "#0A1628" }}>{order.shipping.name}</p>
+                          <p className="text-xs truncate" style={{ color: "#64748B", maxWidth: "130px" }}>
                             {order.email}
                           </p>
-                          <p className="text-xs truncate" style={{ color: "#4A3D6B", maxWidth: "130px" }}>
+                          <p className="text-xs truncate" style={{ color: "#94A3B8", maxWidth: "130px" }}>
                             {order.shipping.city}, {order.shipping.state} {order.shipping.zip}
                           </p>
                         </div>
                       </td>
 
-                      {/* Order Date */}
                       <td style={cellStyle}>
                         <span className="text-xs">{formatDate(order.createdAt)}</span>
-                        <p className="text-xs" style={{ color: "#4A3D6B" }}>
+                        <p className="text-xs" style={{ color: "#94A3B8" }}>
                           {order.id.replace("ORD-", "").split("-")[1]}
                         </p>
                       </td>
 
-                      {/* Items */}
                       <td style={{ ...cellStyle, minWidth: "240px", whiteSpace: "normal" }}>
                         <div className="space-y-0.5">
                           {order.items.map((item, i) => (
                             <p key={i} className="text-xs">
-                              <span className="text-white">{item.name}</span>
+                              <span style={{ color: "#0A1628" }}>{item.name}</span>
                               {item.size && (
-                                <span style={{ color: "#6B5F84" }}> ({item.size})</span>
+                                <span style={{ color: "#64748B" }}> ({item.size})</span>
                               )}
                               <span style={{ color: COLORS.teal }}> ×{item.quantity}</span>
                             </p>
@@ -374,21 +361,14 @@ export default function ShipmentsTable() {
                         </div>
                       </td>
 
-                      {/* Value */}
                       <td style={{ ...cellStyle, textAlign: "right", fontWeight: 600 }}>
                         <span style={{ color: COLORS.teal }}>${order.total.toFixed(2)}</span>
                       </td>
 
-                      {/* Weight (editable) */}
                       {renderEditableCell(order, "weight", "e.g. 1.2 lbs", "90px")}
-
-                      {/* Dimensions (editable) */}
                       {renderEditableCell(order, "dimensions", 'e.g. 10×8×4"', "110px")}
-
-                      {/* Requirements (editable) */}
                       {renderEditableCell(order, "requirements", "e.g. Fragile", "120px")}
 
-                      {/* Status (dropdown) */}
                       <td style={{ ...cellStyle, padding: "6px 8px", minWidth: "110px" }}>
                         <select
                           value={shipStatus}
@@ -402,17 +382,12 @@ export default function ShipmentsTable() {
                           }}
                         >
                           {SHIPMENT_STATUSES.map((s) => (
-                            <option key={s} value={s}>
-                              {s}
-                            </option>
+                            <option key={s} value={s}>{s}</option>
                           ))}
                         </select>
                       </td>
 
-                      {/* Tracking (editable) */}
                       {renderEditableCell(order, "trackingNumber", "Enter tracking #", "140px")}
-
-                      {/* Notes (editable) */}
                       {renderEditableCell(order, "notes", "Add notes...", "160px")}
                     </tr>
                   );
@@ -426,8 +401,8 @@ export default function ShipmentsTable() {
       {/* Summary bar */}
       {orders.length > 0 && (
         <div
-          className="rounded-xl p-4 flex flex-wrap gap-6"
-          style={{ backgroundColor: COLORS.cardBg, border: "1px solid #2D2550" }}
+          className="rounded-xl p-4 flex flex-wrap gap-6 shadow-sm"
+          style={{ backgroundColor: "white", border: "1px solid #CBD5E1" }}
         >
           <div>
             <span className="text-xs block" style={{ color: COLORS.midGray }}>Total Revenue</span>
@@ -437,19 +412,19 @@ export default function ShipmentsTable() {
           </div>
           <div>
             <span className="text-xs block" style={{ color: COLORS.midGray }}>Pending</span>
-            <span className="text-lg font-black" style={{ color: "#FCA5A5" }}>{counts.Pending}</span>
+            <span className="text-lg font-black" style={{ color: "#991B1B" }}>{counts.Pending}</span>
           </div>
           <div>
             <span className="text-xs block" style={{ color: COLORS.midGray }}>Packaged</span>
-            <span className="text-lg font-black" style={{ color: "#FDE68A" }}>{counts.Packaged}</span>
+            <span className="text-lg font-black" style={{ color: "#92400E" }}>{counts.Packaged}</span>
           </div>
           <div>
             <span className="text-xs block" style={{ color: COLORS.midGray }}>Shipped</span>
-            <span className="text-lg font-black" style={{ color: "#93C5FD" }}>{counts.Shipped}</span>
+            <span className="text-lg font-black" style={{ color: "#1E40AF" }}>{counts.Shipped}</span>
           </div>
           <div>
             <span className="text-xs block" style={{ color: COLORS.midGray }}>Delivered</span>
-            <span className="text-lg font-black" style={{ color: "#6EE7B7" }}>{counts.Delivered}</span>
+            <span className="text-lg font-black" style={{ color: "#065F46" }}>{counts.Delivered}</span>
           </div>
         </div>
       )}
