@@ -150,13 +150,20 @@ interface MerchItem {
   name: string;
   price: number;
   priceSol: number;
-  category: "apparel" | "tackle";
+  category: "apparel" | "tackle" | "accessory";
   description: string;
   emoji: string;
   sizes?: string[];
+  imageUrl?: string;
+  gender?: string;
+  weight?: string;
+  dimensions?: string;
+  requirements?: string;
+  status?: string;
 }
 
-const MERCH: MerchItem[] = [
+// Fallback merch shown when inventory is empty
+const DEFAULT_MERCH: MerchItem[] = [
   { id: "m1", name: "Always 80 Performance Sun Shirt", price: 34.99, priceSol: 0.25, category: "apparel", description: "UPF 50+ long sleeve performance shirt", emoji: "👕", sizes: ["XS", "S", "M", "L", "XL", "2XL"] },
   { id: "m2", name: "Captain's Hoodie", price: 44.99, priceSol: 0.33, category: "apparel", description: "Lightweight hoodie for cool mornings on the water", emoji: "🧥", sizes: ["S", "M", "L", "XL", "2XL"] },
   { id: "m3", name: "Always 80 Trucker Hat", price: 24.99, priceSol: 0.18, category: "apparel", description: "Snapback with embroidered logo", emoji: "🧢" },
@@ -166,6 +173,13 @@ const MERCH: MerchItem[] = [
   { id: "m7", name: "Leader & Rigging Kit", price: 24.99, priceSol: 0.18, category: "tackle", description: "Fluorocarbon leaders, swivels, and crimps", emoji: "🧵" },
   { id: "m8", name: "Offshore Trolling Lure Set", price: 44.99, priceSol: 0.33, category: "tackle", description: "4 premium trolling lures for pelagic species", emoji: "🐟" },
 ];
+
+// Map category to a fallback emoji
+function categoryEmoji(cat: string): string {
+  if (cat === "apparel") return "👕";
+  if (cat === "tackle") return "🎣";
+  return "📦";
+}
 
 // --- Components ---
 
@@ -769,11 +783,17 @@ function MerchCard({ item, onClick }: { item: MerchItem; onClick: () => void }) 
       className="rounded-xl overflow-hidden border transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer"
       style={{ backgroundColor: COLORS.cardBg, borderColor: "#CBD5E1" }}
     >
-      <div className="text-9xl text-center py-16 rounded-t-xl" style={{ backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
+      {item.imageUrl ? (
+        <div className="w-full h-64 overflow-hidden rounded-t-xl" style={{ backgroundColor: "#E8F0FE" }}>
+          <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+        </div>
+      ) : (
+        <div className="text-9xl text-center py-16 rounded-t-xl" style={{ backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
+      )}
       <div className="p-5">
         <h3 className="text-slate-900 font-bold text-base leading-tight mb-1">{item.name}</h3>
         <p className="text-sm mb-2" style={{ color: COLORS.lightText }}>{item.description}</p>
-        <span className="text-xl font-black" style={{ color: COLORS.teal }}>${item.price}</span>
+        <span className="text-xl font-black" style={{ color: COLORS.teal }}>${item.price.toFixed(2)}</span>
       </div>
     </div>
   );
@@ -793,7 +813,13 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.4)" }} onClick={onClose}>
       <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "white" }} onClick={(e) => e.stopPropagation()}>
         {/* Large image area */}
-        <div className="text-9xl text-center py-16" style={{ backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
+        {item.imageUrl ? (
+          <div className="w-full h-72 overflow-hidden" style={{ backgroundColor: "#E8F0FE" }}>
+            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <div className="text-9xl text-center py-16" style={{ backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
+        )}
 
         <div className="p-6">
           <div className="flex justify-between items-start mb-2">
@@ -879,6 +905,156 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
             Add to Cart — ${(item.price * quantity).toFixed(2)}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Rotating Hero Banner ---
+function RotatingHeroBanner({ merch, onShopNow }: { merch: MerchItem[]; onShopNow: () => void }) {
+  const [slide, setSlide] = useState(0);
+
+  // Auto-rotate every 6 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSlide((prev) => (prev === 0 ? 1 : 0));
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Get newest item (last in array, or first if from defaults)
+  const newestItem = merch.length > 0 ? merch[merch.length - 1] : null;
+
+  return (
+    <div className="relative w-full overflow-hidden" style={{ height: "420px" }}>
+      {/* Slide 1: Spend and Save */}
+      <div
+        className="absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out"
+        style={{
+          opacity: slide === 0 ? 1 : 0,
+          transform: slide === 0 ? "translateX(0)" : "translateX(-100%)",
+          pointerEvents: slide === 0 ? "auto" : "none",
+          background: "linear-gradient(135deg, #0891D4 0%, #0A1628 60%, #E08A00 100%)",
+        }}
+      >
+        <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center gap-8 w-full">
+          <div className="flex-1 text-center md:text-left">
+            <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: "rgba(255,255,255,0.7)" }}>Limited Time Offer</p>
+            <h2 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-wider mb-4" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.3)" }}>
+              Spend & Save
+            </h2>
+            <p className="text-base text-white/80 mb-6 max-w-md">The more you spend, the more you save. Stock up on your favorite gear!</p>
+            <button
+              onClick={onShopNow}
+              className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105"
+              style={{ backgroundColor: "white", color: "#0A1628" }}
+            >
+              Shop Now
+            </button>
+          </div>
+          <div className="flex-1 flex flex-col gap-3 max-w-sm w-full">
+            {/* Tier cards */}
+            <div className="rounded-xl p-4 flex items-center gap-4" style={{ backgroundColor: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.2)" }}>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black shrink-0" style={{ backgroundColor: "#E08A00", color: "white" }}>15%</div>
+              <div>
+                <p className="text-white font-bold text-lg">15% Off</p>
+                <p className="text-white/70 text-sm">Orders of $75.00 or more</p>
+              </div>
+            </div>
+            <div className="rounded-xl p-4 flex items-center gap-4" style={{ backgroundColor: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.25)" }}>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black shrink-0" style={{ backgroundColor: "#D97706", color: "white" }}>20%</div>
+              <div>
+                <p className="text-white font-bold text-lg">20% Off</p>
+                <p className="text-white/70 text-sm">Orders of $125.00 or more</p>
+              </div>
+            </div>
+            <div className="rounded-xl p-4 flex items-center gap-4" style={{ backgroundColor: "rgba(255,255,255,0.24)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black shrink-0" style={{ backgroundColor: "#B45309", color: "white" }}>25%</div>
+              <div>
+                <p className="text-white font-bold text-lg">25% Off</p>
+                <p className="text-white/70 text-sm">Orders over $200.00</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Slide 2: Newest Item Spotlight */}
+      <div
+        className="absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out"
+        style={{
+          opacity: slide === 1 ? 1 : 0,
+          transform: slide === 1 ? "translateX(0)" : "translateX(100%)",
+          pointerEvents: slide === 1 ? "auto" : "none",
+          background: "linear-gradient(135deg, #F0F7FF 0%, #E0F2FE 50%, #BAE6FD 100%)",
+        }}
+      >
+        {newestItem ? (
+          <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10 w-full">
+            {/* Product image */}
+            <div className="flex-1 flex justify-center">
+              <div className="w-72 h-72 rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "white" }}>
+                {newestItem.imageUrl ? (
+                  <img src={newestItem.imageUrl} alt={newestItem.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-9xl" style={{ backgroundColor: "#E8F0FE" }}>{newestItem.emoji}</div>
+                )}
+              </div>
+            </div>
+            {/* Product info */}
+            <div className="flex-1 text-center md:text-left">
+              <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: COLORS.teal }}>Just Added</p>
+              <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-wider mb-3" style={{ color: "#0A1628" }}>
+                {newestItem.name}
+              </h2>
+              <p className="text-base mb-4 max-w-md" style={{ color: COLORS.lightText }}>
+                {newestItem.description}
+              </p>
+              {newestItem.sizes && newestItem.sizes.length > 0 && (
+                <p className="text-sm mb-2" style={{ color: COLORS.midGray }}>
+                  Available sizes: {newestItem.sizes.join(", ")}
+                </p>
+              )}
+              {newestItem.gender && (
+                <p className="text-sm mb-4" style={{ color: COLORS.midGray }}>
+                  Style: {newestItem.gender}
+                </p>
+              )}
+              <div className="flex items-baseline gap-3 mb-5 justify-center md:justify-start">
+                <span className="text-3xl font-black" style={{ color: COLORS.teal }}>${newestItem.price.toFixed(2)}</span>
+                {newestItem.priceSol > 0 && (
+                  <span className="text-sm" style={{ color: COLORS.midGray }}>{newestItem.priceSol} SOL</span>
+                )}
+              </div>
+              <button
+                onClick={onShopNow}
+                className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105"
+                style={{ backgroundColor: COLORS.teal, color: "white" }}
+              >
+                Shop Now
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center px-6">
+            <h2 className="text-3xl font-black uppercase tracking-wider mb-3" style={{ color: "#0A1628" }}>New Items Coming Soon</h2>
+            <p className="text-base" style={{ color: COLORS.lightText }}>Check back for our latest additions!</p>
+          </div>
+        )}
+      </div>
+
+      {/* Slide indicators */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        <button
+          onClick={() => setSlide(0)}
+          className="w-3 h-3 rounded-full cursor-pointer transition-all"
+          style={{ backgroundColor: slide === 0 ? "white" : "rgba(255,255,255,0.5)", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }}
+        />
+        <button
+          onClick={() => setSlide(1)}
+          className="w-3 h-3 rounded-full cursor-pointer transition-all"
+          style={{ backgroundColor: slide === 1 ? COLORS.teal : "rgba(0,0,0,0.2)" }}
+        />
       </div>
     </div>
   );
@@ -1122,6 +1298,7 @@ function Always80AppInner() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [selectedMerch, setSelectedMerch] = useState<MerchItem | null>(null);
+  const [merch, setMerch] = useState<MerchItem[]>(DEFAULT_MERCH);
   const walletModal = useWalletModal();
   const { publicKey } = useWallet();
   const searchParams = useSearchParams();
@@ -1156,6 +1333,41 @@ function Always80AppInner() {
       }
     }
     loadPosts();
+  }, []);
+
+  // Fetch inventory items and merge into merch for storefront display
+  useEffect(() => {
+    async function loadInventory() {
+      try {
+        const res = await fetch("/api/inventory");
+        const data = await res.json();
+        if (data.items && data.items.length > 0) {
+          const liveItems: MerchItem[] = data.items
+            .filter((inv: { status?: string; quantity?: number }) => inv.status === "active" && (inv.quantity ?? 0) > 0)
+            .map((inv: { id: string; name: string; price: number; priceSol?: number; category?: string; description?: string; imageUrl?: string; sizes?: string; gender?: string; weight?: string; dimensions?: string; requirements?: string; status?: string }) => ({
+              id: inv.id,
+              name: inv.name,
+              price: inv.price,
+              priceSol: inv.priceSol || 0,
+              category: (inv.category === "apparel" || inv.category === "tackle" || inv.category === "accessory") ? inv.category : "accessory",
+              description: inv.description || "",
+              emoji: categoryEmoji(inv.category || ""),
+              sizes: inv.sizes ? inv.sizes.split(",").map((s: string) => s.trim()).filter(Boolean) : undefined,
+              imageUrl: inv.imageUrl || undefined,
+              gender: inv.gender || undefined,
+              weight: inv.weight || undefined,
+              dimensions: inv.dimensions || undefined,
+              requirements: inv.requirements || undefined,
+              status: inv.status || "active",
+            }));
+          // Use live inventory if available, otherwise keep defaults
+          setMerch(liveItems.length > 0 ? liveItems : DEFAULT_MERCH);
+        }
+      } catch {
+        // Fall back to DEFAULT_MERCH
+      }
+    }
+    loadInventory();
   }, []);
 
   // If wallet disconnects or changes away from owner, redirect off dashboard
@@ -1228,6 +1440,10 @@ function Always80AppInner() {
       <nav className="border-b px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40 shadow-sm" style={{ borderColor: "#CBD5E1", backgroundColor: "rgba(255, 255, 255, 0.97)", backdropFilter: "blur(12px)" }}>
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView("storefront")}>
           <img src="/logo.png" alt="Always 80 and Sunny" className="h-[80px] w-auto rounded-lg" />
+          <div className="hidden sm:flex flex-col">
+            <span className="text-base font-black uppercase tracking-wider" style={{ color: "#0A1628", lineHeight: "1.2" }}>Custom Baits</span>
+            <span className="text-base font-black uppercase tracking-wider" style={{ color: "#0A1628", lineHeight: "1.2" }}>& Tackle</span>
+          </div>
         </div>
         <div className="hidden md:flex gap-1">
           {views.map((v) => (
@@ -1307,40 +1523,8 @@ function Always80AppInner() {
             </div>
           )}
 
-          {/* === HERO BANNER === */}
-          <div className="relative w-full overflow-hidden" style={{ height: "520px" }}>
-            <div className="absolute inset-0" style={{
-              backgroundImage: "url(/beach-bg.jpg)",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              filter: "brightness(1.1) saturate(1.2)",
-            }} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6" style={{ background: "linear-gradient(to bottom, rgba(135,206,250,0.15), rgba(10,22,40,0.35))" }}>
-              <img src="/logo.png" alt="Always 80 and Sunny" className="h-[140px] w-auto mb-4 drop-shadow-2xl" />
-              <h1 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-wider mb-3" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
-                CUSTOM BAITS & TACKLE
-              </h1>
-              <p className="text-lg text-white/80 mb-6 max-w-lg" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.5)" }}>
-                Hand-painted swimbaits, premium tackle, and unforgettable fishing charters
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => { const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" }); }}
-                  className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105"
-                  style={{ backgroundColor: "white", color: "#0A1628" }}
-                >
-                  Shop Now
-                </button>
-                <button
-                  onClick={() => setView("charters")}
-                  className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105 border-2 border-white"
-                  style={{ backgroundColor: "transparent", color: "white" }}
-                >
-                  Book a Charter
-                </button>
-              </div>
-            </div>
-          </div>
+          {/* === ROTATING HERO BANNER === */}
+          <RotatingHeroBanner merch={merch} onShopNow={() => { const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" }); }} />
 
           {/* === SHOP BY CATEGORY (horizontal scroll) === */}
           <div className="py-10 px-4 sm:px-6" style={{ backgroundColor: "#E0F2FE" }}>
@@ -1416,9 +1600,13 @@ function Always80AppInner() {
                 </button>
               </div>
               <div className="flex-1 flex justify-center gap-3">
-                {MERCH.filter(m => m.category === "apparel").slice(0, 3).map((item) => (
-                  <div key={item.id} className="w-28 h-28 rounded-xl flex items-center justify-center text-5xl" style={{ backgroundColor: COLORS.cardBg }}>
-                    {item.emoji}
+                {merch.filter(m => m.category === "apparel").slice(0, 3).map((item) => (
+                  <div key={item.id} className="w-28 h-28 rounded-xl flex items-center justify-center text-5xl overflow-hidden" style={{ backgroundColor: COLORS.cardBg }}>
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      item.emoji
+                    )}
                   </div>
                 ))}
               </div>
@@ -1430,11 +1618,11 @@ function Always80AppInner() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>New Arrivals</h2>
               <div className="flex items-center gap-2">
-                <span className="text-sm" style={{ color: COLORS.midGray }}>{MERCH.length} items</span>
+                <span className="text-sm" style={{ color: COLORS.midGray }}>{merch.length} items</span>
               </div>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
-              {MERCH.map((item) => (
+              {merch.map((item) => (
                 <div key={item.id} className="shrink-0 w-96">
                   <MerchCard item={item} onClick={() => setSelectedMerch(item)} />
                 </div>
@@ -1478,7 +1666,7 @@ function Always80AppInner() {
               <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Best Sellers</h2>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
-              {[...MERCH].sort(() => 0.5 - Math.random()).map((item) => (
+              {[...merch].sort(() => 0.5 - Math.random()).map((item) => (
                 <div key={`best-${item.id}`} className="shrink-0 w-96">
                   <MerchCard item={item} onClick={() => setSelectedMerch(item)} />
                 </div>
