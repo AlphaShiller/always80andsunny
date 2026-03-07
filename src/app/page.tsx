@@ -1311,9 +1311,9 @@ function Always80AppInner() {
               backgroundImage: "url(/beach-bg.jpg)",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              filter: "brightness(0.6)",
+              filter: "brightness(1.1) saturate(1.2)",
             }} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6" style={{ background: "linear-gradient(to bottom, rgba(10,22,40,0.2), rgba(10,22,40,0.7))" }}>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6" style={{ background: "linear-gradient(to bottom, rgba(135,206,250,0.15), rgba(10,22,40,0.35))" }}>
               <img src="/logo.png" alt="Always 80 and Sunny" className="h-[140px] w-auto mb-4 drop-shadow-2xl" />
               <h1 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-wider mb-3" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
                 CUSTOM BAITS & TACKLE
@@ -1344,7 +1344,7 @@ function Always80AppInner() {
           <div className="py-10 px-4 sm:px-6" style={{ backgroundColor: "#E0F2FE" }}>
             <div className="max-w-6xl mx-auto">
               <h2 className="text-center text-2xl font-black uppercase tracking-wider mb-6" style={{ color: "#0A1628" }}>Shop by Category</h2>
-              <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
+              <div className="flex flex-wrap justify-center gap-8 pb-4">
                 {[
                   { label: "Swimbaits", emoji: "🎣", filter: "tackle" },
                   { label: "Apparel", emoji: "👕", filter: "apparel" },
@@ -1361,12 +1361,12 @@ function Always80AppInner() {
                       if (cat.filter === "memberships") { const el = document.getElementById("tiers-section"); el?.scrollIntoView({ behavior: "smooth" }); return; }
                       const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" });
                     }}
-                    className="flex flex-col items-center gap-2 cursor-pointer group shrink-0"
+                    className="flex flex-col items-center gap-3 cursor-pointer group"
                   >
-                    <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl transition-all group-hover:scale-110 shadow-md" style={{ backgroundColor: "white", border: "2px solid #CBD5E1" }}>
+                    <div className="w-40 h-40 rounded-full flex items-center justify-center text-6xl transition-all group-hover:scale-110 shadow-md" style={{ backgroundColor: "white", border: "2px solid #CBD5E1" }}>
                       {cat.emoji}
                     </div>
-                    <span className="text-xs font-semibold uppercase tracking-wider group-hover:text-gray-900" style={{ color: "#334155" }}>{cat.label}</span>
+                    <span className="text-base font-semibold uppercase tracking-wider group-hover:text-gray-900" style={{ color: "#334155" }}>{cat.label}</span>
                   </button>
                 ))}
               </div>
