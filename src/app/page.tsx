@@ -1027,7 +1027,7 @@ function NewsletterSection() {
 // --- Main App ---
 
 function Always80AppInner() {
-  const [view, setView] = useState<"storefront" | "videos" | "feed" | "dashboard" | "shipments">("storefront");
+  const [view, setView] = useState<"storefront" | "videos" | "feed" | "charters" | "dashboard" | "shipments">("storefront");
   const [purchases, setPurchases] = useState<{ id: string; signature?: string }[]>([]);
   const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
   const [canceledNotice, setCanceledNotice] = useState(false);
