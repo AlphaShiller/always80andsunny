@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 
 const SYSTEM_PROMPT = `You are Sunny — the Always 80 and Sunny Assistant for a custom baits, tackle, and fishing charter business. You're the laid-back fishing buddy who knows everything about the shop and always has a good fish story ready.
 
@@ -100,33 +99,77 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const client = new Anthropic({ apiKey });
-
-    const stream = await client.messages.stream({
-      model: "claude-3-haiku-20240307",
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      messages: messages.map((m: { role: string; content: string }) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      })),
+    // Use direct fetch instead of Anthropic SDK to avoid connection issues on Vercel
+    const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-3-haiku-20240307",
+        max_tokens: 1024,
+        stream: true,
+        system: SYSTEM_PROMPT,
+        messages: messages.map((m: { role: string; content: string }) => ({
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        })),
+      }),
     });
 
+    if (!anthropicRes.ok) {
+      const errText = await anthropicRes.text();
+      console.error("Anthropic API error:", anthropicRes.status, errText);
+      return new Response(JSON.stringify({ error: `API error: ${anthropicRes.status}` }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (!anthropicRes.body) {
+      return new Response(JSON.stringify({ error: "No response body" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
 
     const readable = new ReadableStream({
       async start(controller) {
         try {
-          for await (const event of stream) {
-            if (
-              event.type === "content_block_delta" &&
-              event.delta.type === "text_delta"
-            ) {
-              controller.enqueue(
-                encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`)
-              );
+          const reader = anthropicRes.body!.getReader();
+          let buffer = "";
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                const data = line.slice(6).trim();
+                if (data === "[DONE]") continue;
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.type === "content_block_delta" && parsed.delta?.text) {
+                    controller.enqueue(
+                      encoder.encode(`data: ${JSON.stringify({ text: parsed.delta.text })}\n\n`)
+                    );
+                  }
+                } catch {
+                  // skip unparseable chunks
+                }
+              }
             }
           }
+
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
         } catch (err) {
