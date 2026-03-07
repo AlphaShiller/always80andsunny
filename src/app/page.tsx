@@ -1129,11 +1129,13 @@ function Always80AppInner() {
   const views = allViews.filter((v) => !v.ownerOnly || isOwner);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: COLORS.darkBg }}>
-      {/* Full-page watermark */}
-      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none" style={{ opacity: 0.07 }}>
-        <img src="/logo.png" alt="" className="w-[112vmin] h-[112vmin] object-contain" />
-      </div>
+    <div className="min-h-screen" style={{
+      backgroundColor: COLORS.darkBg,
+      backgroundImage: "linear-gradient(rgba(10, 22, 40, 0.55), rgba(10, 22, 40, 0.55)), url(/beach-bg.jpg)",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundAttachment: "fixed",
+    }}>
       {/* Nav — sticky */}
       <nav className="border-b px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40" style={{ borderColor: "#2D2550", backgroundColor: COLORS.darkBg }}>
         <div className="flex items-center gap-3">
