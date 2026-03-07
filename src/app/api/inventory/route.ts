@@ -112,7 +112,7 @@ export async function PATCH(req: NextRequest) {
 
     for (const field of updatableFields) {
       if (field in updates) {
-        (items[idx] as Record<string, unknown>)[field] = updates[field];
+        (items[idx] as unknown as Record<string, unknown>)[field] = updates[field];
       }
     }
     items[idx].updatedAt = new Date().toISOString();
