@@ -1336,7 +1336,9 @@ function Always80AppInner() {
   }, []);
 
   // Fetch inventory items and merge into merch for storefront display
+  // Re-fetches whenever user navigates back to storefront so inventory changes appear immediately
   useEffect(() => {
+    if (view !== "storefront") return;
     async function loadInventory() {
       try {
         const res = await fetch("/api/inventory");
@@ -1360,7 +1362,6 @@ function Always80AppInner() {
               requirements: inv.requirements || undefined,
               status: inv.status || "active",
             }));
-          // Use live inventory if available, otherwise keep defaults
           setMerch(liveItems.length > 0 ? liveItems : DEFAULT_MERCH);
         }
       } catch {
@@ -1368,7 +1369,7 @@ function Always80AppInner() {
       }
     }
     loadInventory();
-  }, []);
+  }, [view]);
 
   // If wallet disconnects or changes away from owner, redirect off dashboard
   useEffect(() => {
@@ -1580,57 +1581,45 @@ function Always80AppInner() {
             </div>
           </div>
 
-          {/* === LIFESTYLE BANNER 1 === */}
-          <div className="relative w-full py-16" style={{
-            backgroundImage: "linear-gradient(135deg, rgba(217,119,6,0.08), rgba(14,165,233,0.08))",
-            backgroundColor: "#F8FAFC",
-          }}>
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-1 text-center md:text-left">
-                <h2 className="text-3xl font-black uppercase tracking-wider mb-3" style={{ color: "#0A1628" }}>Fresh Gear, Built for the Water</h2>
-                <p className="text-base mb-5" style={{ color: COLORS.lightText }}>
-                  UPF 50+ performance shirts, quick-dry shorts, and gear that handles anything the ocean throws at you.
-                </p>
-                <button
-                  onClick={() => { const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" }); }}
-                  className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105"
-                  style={{ backgroundColor: COLORS.teal, color: "#0A1628" }}
-                >
-                  Shop Apparel
-                </button>
-              </div>
-              <div className="flex-1 flex justify-center gap-3">
-                {merch.filter(m => m.category === "apparel").slice(0, 3).map((item) => (
-                  <div key={item.id} className="w-28 h-28 rounded-xl flex items-center justify-center text-5xl overflow-hidden" style={{ backgroundColor: COLORS.cardBg }}>
-                    {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
-                    ) : (
-                      item.emoji
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* === MERCHANDISE — Horizontal Scrollable Carousel === */}
+          {/* === NEW ARRIVALS — All Items Carousel === */}
           <div id="merch-section" className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>New Arrivals</h2>
-              <div className="flex items-center gap-2">
-                <span className="text-sm" style={{ color: COLORS.midGray }}>{merch.length} items</span>
+              <span className="text-sm" style={{ color: COLORS.midGray }}>{merch.length} items</span>
+            </div>
+            {merch.length > 0 ? (
+              <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
+                {merch.map((item) => (
+                  <div key={item.id} className="shrink-0 w-96">
+                    <MerchCard item={item} onClick={() => setSelectedMerch(item)} />
+                  </div>
+                ))}
               </div>
-            </div>
-            <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
-              {merch.map((item) => (
-                <div key={item.id} className="shrink-0 w-96">
-                  <MerchCard item={item} onClick={() => setSelectedMerch(item)} />
-                </div>
-              ))}
-            </div>
+            ) : (
+              <p className="text-center py-8" style={{ color: COLORS.midGray }}>No items yet — add products in the Inventory tab.</p>
+            )}
           </div>
 
-          {/* === LIFESTYLE BANNER 2 — Charters === */}
+          {/* === APPAREL — Category Carousel === */}
+          {merch.filter(m => m.category === "apparel").length > 0 && (
+            <div className="py-10 px-4 sm:px-6" style={{ backgroundColor: "#F0F7FF" }}>
+              <div className="max-w-6xl mx-auto">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Apparel</h2>
+                  <span className="text-sm" style={{ color: COLORS.midGray }}>{merch.filter(m => m.category === "apparel").length} items</span>
+                </div>
+                <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
+                  {merch.filter(m => m.category === "apparel").map((item) => (
+                    <div key={`apparel-${item.id}`} className="shrink-0 w-96">
+                      <MerchCard item={item} onClick={() => setSelectedMerch(item)} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* === LIFESTYLE BANNER — Charters === */}
           <div className="relative w-full py-20" style={{
             backgroundImage: "linear-gradient(to right, rgba(10,22,40,0.65), rgba(10,22,40,0.3)), url(/beach-bg.jpg)",
             backgroundSize: "cover",
@@ -1660,19 +1649,40 @@ function Always80AppInner() {
             </div>
           </div>
 
-          {/* === BEST SELLERS — Tackle Carousel === */}
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Best Sellers</h2>
+          {/* === BEST SELLERS Carousel === */}
+          {merch.length > 0 && (
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Best Sellers</h2>
+              </div>
+              <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
+                {[...merch].sort((a, b) => a.id.localeCompare(b.id)).map((item) => (
+                  <div key={`best-${item.id}`} className="shrink-0 w-96">
+                    <MerchCard item={item} onClick={() => setSelectedMerch(item)} />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
-              {[...merch].sort(() => 0.5 - Math.random()).map((item) => (
-                <div key={`best-${item.id}`} className="shrink-0 w-96">
-                  <MerchCard item={item} onClick={() => setSelectedMerch(item)} />
+          )}
+
+          {/* === TACKLE — Category Carousel === */}
+          {merch.filter(m => m.category === "tackle").length > 0 && (
+            <div className="py-10 px-4 sm:px-6" style={{ backgroundColor: "#F8FAFC" }}>
+              <div className="max-w-6xl mx-auto">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Tackle</h2>
+                  <span className="text-sm" style={{ color: COLORS.midGray }}>{merch.filter(m => m.category === "tackle").length} items</span>
                 </div>
-              ))}
+                <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
+                  {merch.filter(m => m.category === "tackle").map((item) => (
+                    <div key={`tackle-${item.id}`} className="shrink-0 w-96">
+                      <MerchCard item={item} onClick={() => setSelectedMerch(item)} />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* === PRODUCTS & DOWNLOADS === */}
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
