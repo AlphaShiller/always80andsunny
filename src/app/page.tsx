@@ -1129,15 +1129,15 @@ function Always80AppInner() {
   const views = allViews.filter((v) => !v.ownerOnly || isOwner);
 
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: COLORS.darkBg }}>
-      {/* Full-page beach background */}
-      <div className="fixed inset-0 z-0 pointer-events-none" style={{ opacity: 0.5 }}>
-        <img src="/beach-bg.jpg" alt="" className="w-full h-full object-cover" />
+    <div className="min-h-screen" style={{ backgroundColor: COLORS.darkBg }}>
+      {/* Full-page watermark */}
+      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none" style={{ opacity: 0.07 }}>
+        <img src="/logo.png" alt="" className="w-[112vmin] h-[112vmin] object-contain" />
       </div>
       {/* Nav — sticky */}
       <nav className="border-b px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40" style={{ borderColor: "#2D2550", backgroundColor: COLORS.darkBg }}>
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Always 80 and Sunny" className="h-[117px] w-auto rounded-lg" />
+          <img src="/logo.png" alt="Always 80 and Sunny" className="h-[90px] w-auto rounded-lg" />
           <div className="hidden sm:flex items-center gap-2">
             <span className="text-white font-bold text-lg">Always 80</span>
             <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#0D3B2E", color: COLORS.teal }}>DEVNET</span>
@@ -1167,7 +1167,7 @@ function Always80AppInner() {
 
       <WalletModal walletModal={walletModal} />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 relative z-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {view === "storefront" && (
           <div className="space-y-8">
             <div className="rounded-lg p-3 text-center text-xs" style={{ backgroundColor: "#0D3B2E", color: COLORS.teal }}>
@@ -1490,7 +1490,7 @@ function Always80AppInner() {
         )}
       </div>
 
-      <footer className="border-t px-6 py-4 text-center relative z-10" style={{ borderColor: "#2D2550", backgroundColor: COLORS.darkBg }}>
+      <footer className="border-t px-6 py-4 text-center" style={{ borderColor: "#2D2550" }}>
         <p className="text-xs" style={{ color: COLORS.midGray }}>
           Always 80 and Sunny — Custom Baits, Tackle & Charters on Solana | Near-zero fees. Instant payouts. | Devnet
         </p>
