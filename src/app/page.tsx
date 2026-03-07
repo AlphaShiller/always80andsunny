@@ -768,11 +768,11 @@ function MerchCard({ item, onClick }: { item: MerchItem; onClick: () => void }) 
       className="rounded-xl overflow-hidden border transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer"
       style={{ backgroundColor: COLORS.cardBg, borderColor: "#CBD5E1" }}
     >
-      <div className="text-8xl text-center py-12 rounded-t-xl" style={{ backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
-      <div className="p-4">
-        <h3 className="text-slate-900 font-bold text-sm leading-tight mb-1">{item.name}</h3>
-        <p className="text-xs mb-2" style={{ color: COLORS.lightText }}>{item.description}</p>
-        <span className="text-lg font-black" style={{ color: COLORS.teal }}>${item.price}</span>
+      <div className="text-9xl text-center py-16 rounded-t-xl" style={{ backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
+      <div className="p-5">
+        <h3 className="text-slate-900 font-bold text-base leading-tight mb-1">{item.name}</h3>
+        <p className="text-sm mb-2" style={{ color: COLORS.lightText }}>{item.description}</p>
+        <span className="text-xl font-black" style={{ color: COLORS.teal }}>${item.price}</span>
       </div>
     </div>
   );
@@ -1376,7 +1376,7 @@ function Always80AppInner() {
           {/* === FEATURED VIDEO === */}
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-black uppercase tracking-wider">Featured Video</h2>
+              <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Featured Video</h2>
               <button onClick={() => setView("videos")} className="text-sm font-semibold cursor-pointer hover:underline" style={{ color: COLORS.teal }}>
                 View All Videos →
               </button>
@@ -1426,14 +1426,14 @@ function Always80AppInner() {
           {/* === MERCHANDISE — Horizontal Scrollable Carousel === */}
           <div id="merch-section" className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-black uppercase tracking-wider">New Arrivals</h2>
+              <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>New Arrivals</h2>
               <div className="flex items-center gap-2">
                 <span className="text-sm" style={{ color: COLORS.midGray }}>{MERCH.length} items</span>
               </div>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
               {MERCH.map((item) => (
-                <div key={item.id} className="shrink-0 w-64">
+                <div key={item.id} className="shrink-0 w-96">
                   <MerchCard item={item} onClick={() => setSelectedMerch(item)} />
                 </div>
               ))}
@@ -1473,11 +1473,11 @@ function Always80AppInner() {
           {/* === BEST SELLERS — Tackle Carousel === */}
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-black uppercase tracking-wider">Best Sellers</h2>
+              <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Best Sellers</h2>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
               {[...MERCH].sort(() => 0.5 - Math.random()).map((item) => (
-                <div key={`best-${item.id}`} className="shrink-0 w-64">
+                <div key={`best-${item.id}`} className="shrink-0 w-96">
                   <MerchCard item={item} onClick={() => setSelectedMerch(item)} />
                 </div>
               ))}
@@ -1486,7 +1486,7 @@ function Always80AppInner() {
 
           {/* === PRODUCTS & DOWNLOADS === */}
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-            <h2 className="text-2xl font-black uppercase tracking-wider mb-6">Products & Downloads</h2>
+            <h2 className="text-2xl font-black uppercase tracking-wider mb-6" style={{ color: "#0A1628" }}>Products & Downloads</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {creator.products.map((product) => (
                 <ProductCard key={product.id} product={product} onPurchase={handlePurchase} openWalletModal={() => walletModal.setVisible(true)} />
@@ -1498,7 +1498,7 @@ function Always80AppInner() {
           <div id="tiers-section" className="py-12 px-4 sm:px-6" style={{ backgroundColor: "#E0F2FE" }}>
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-black uppercase tracking-wider mb-2">Membership Tiers</h2>
+                <h2 className="text-2xl font-black uppercase tracking-wider mb-2" style={{ color: "#0A1628" }}>Membership Tiers</h2>
                 <p className="text-sm" style={{ color: COLORS.lightText }}>Unlock exclusive content, secret spots, and VIP charter access</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
