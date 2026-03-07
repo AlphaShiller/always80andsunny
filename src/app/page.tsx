@@ -1143,7 +1143,7 @@ function Always80AppInner() {
           {views.map((v) => (
             <button
               key={v.key}
-              onClick={() => setView(v.key)}
+              onClick={() => setView(v.key as ViewKey)}
               className="px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer"
               style={{ backgroundColor: view === v.key ? COLORS.purple : "transparent", color: view === v.key ? "white" : COLORS.lightText }}
             >
