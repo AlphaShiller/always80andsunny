@@ -1230,6 +1230,16 @@ function Always80AppInner() {
               </div>
             </div>
 
+            {/* Merchandise */}
+            <div>
+              <h2 className="text-lg font-bold text-white mb-4">Merchandise</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                {MERCH.map((item) => (
+                  <MerchCard key={item.id} item={item} onAddToCart={handleAddToCart} />
+                ))}
+              </div>
+            </div>
+
             {/* Products */}
             <div>
               <h2 className="text-lg font-bold text-white mb-4">Products & Downloads</h2>
@@ -1268,16 +1278,6 @@ function Always80AppInner() {
                 ))}
               </div>
             )}
-
-            {/* Merchandise */}
-            <div>
-              <h2 className="text-lg font-bold text-white mb-4">Merchandise</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                {MERCH.map((item) => (
-                  <MerchCard key={item.id} item={item} onAddToCart={handleAddToCart} />
-                ))}
-              </div>
-            </div>
 
             {/* Newsletter */}
             <NewsletterSection />
