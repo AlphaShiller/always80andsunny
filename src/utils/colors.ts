@@ -1,8 +1,8 @@
 export const COLORS = {
-  darkBg: "#0A1628",
-  purple: "#D97706",      // warm amber/gold (primary accent)
-  teal: "#0EA5E9",        // ocean blue (secondary accent)
-  cardBg: "#111D32",
-  lightText: "#C8D6E5",
-  midGray: "#64748B",
+  darkBg: "#F0F7FF",       // light sky blue-white
+  purple: "#E08A00",       // warm amber/gold (primary accent - slightly brighter)
+  teal: "#0891D4",         // ocean blue (secondary accent)
+  cardBg: "#FFFFFF",       // white cards
+  lightText: "#334155",    // dark slate for readable body text
+  midGray: "#6B7F99",      // softer mid-tone
 };
