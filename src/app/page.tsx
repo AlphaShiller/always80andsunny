@@ -1026,8 +1026,10 @@ function NewsletterSection() {
 
 // --- Main App ---
 
+type ViewKey = "storefront" | "videos" | "feed" | "charters" | "dashboard" | "shipments";
+
 function Always80AppInner() {
-  const [view, setView] = useState<"storefront" | "videos" | "feed" | "charters" | "dashboard" | "shipments">("storefront");
+  const [view, setView] = useState<ViewKey>("storefront");
   const [purchases, setPurchases] = useState<{ id: string; signature?: string }[]>([]);
   const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
   const [canceledNotice, setCanceledNotice] = useState(false);
@@ -1116,7 +1118,6 @@ function Always80AppInner() {
   // Only show Dashboard tab if connected wallet is the creator/owner
   const isOwner = publicKey && publicKey.toBase58() === CREATOR_WALLET.toBase58();
 
-  type ViewKey = "storefront" | "videos" | "feed" | "charters" | "dashboard" | "shipments";
   const allViews: { key: ViewKey; label: string; ownerOnly?: boolean }[] = [
     { key: "storefront", label: "Storefront" },
     { key: "videos", label: "Videos" },
