@@ -135,7 +135,7 @@ interface Video {
 }
 
 const VIDEOS: Video[] = [
-  { id: "v1", title: "Custom Swimbait Making: Behind the Scenes", youtubeId: "placeholder1", featured: true },
+  { id: "v1", title: "Custom Swimbait Making: Behind the Scenes", youtubeId: "GWnPfN_-HDg", featured: true },
   { id: "v2", title: "Inshore Redfish: Sight Casting Techniques", youtubeId: "placeholder2" },
   { id: "v3", title: "Offshore Trolling: Mahi Mahi & Tuna", youtubeId: "placeholder3" },
   { id: "v4", title: "How to Rig Live Bait Like a Pro", youtubeId: "placeholder4" },
