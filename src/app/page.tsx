@@ -1656,27 +1656,6 @@ function Always80AppInner() {
             </div>
           </div>
 
-          {/* === FEATURED VIDEO === */}
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Featured Video</h2>
-              <button onClick={() => setView("videos")} className="text-sm font-semibold cursor-pointer hover:underline" style={{ color: COLORS.teal }}>
-                View All Videos →
-              </button>
-            </div>
-            <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
-              <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                <iframe
-                  className="absolute inset-0 w-full h-full"
-                  src={`https://www.youtube.com/embed/${VIDEOS.find(v => v.featured)?.youtubeId || VIDEOS[0].youtubeId}`}
-                  title={VIDEOS.find(v => v.featured)?.title || VIDEOS[0].title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-            </div>
-          </div>
-
           {/* === NEW ARRIVALS — All Items Carousel === */}
           <div id="merch-section" className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
             <div className="flex items-center justify-between mb-6">
