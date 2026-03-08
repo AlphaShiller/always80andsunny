@@ -216,15 +216,20 @@ export default function InventoryTable() {
     item: InventoryItem,
     field: keyof InventoryItem,
     placeholder: string,
-    width?: string
+    width?: string,
+    wrap?: boolean
   ) => {
     const isEditing = editingCell?.itemId === item.id && editingCell?.field === field;
     const value = String(item[field] ?? "");
     const isSaving = saving === item.id;
 
+    const wrapStyle = wrap
+      ? { whiteSpace: "normal" as const, wordBreak: "break-word" as const, maxWidth: width, overflow: "visible" as const, textOverflow: "clip" as const }
+      : {};
+
     if (isEditing) {
       return (
-        <td style={{ ...cellStyle, padding: "4px 6px", minWidth: width }}>
+        <td style={{ ...cellStyle, ...wrapStyle, padding: "4px 6px", minWidth: width }}>
           <input
             type="text"
             value={editValue}
@@ -246,7 +251,7 @@ export default function InventoryTable() {
 
     return (
       <td
-        style={{ ...cellStyle, cursor: "pointer", minWidth: width, opacity: isSaving ? 0.5 : 1 }}
+        style={{ ...cellStyle, ...wrapStyle, cursor: "pointer", minWidth: width, opacity: isSaving ? 0.5 : 1 }}
         onClick={() => startEdit(item.id, field, value)}
         title={`Click to edit — ${value || placeholder}`}
       >
@@ -405,8 +410,8 @@ export default function InventoryTable() {
             <thead>
               <tr>
                 <th style={{ ...headerStyle, minWidth: "60px" }}>Image</th>
-                <th style={{ ...headerStyle, minWidth: "160px" }}>Product Name</th>
-                <th style={{ ...headerStyle, minWidth: "200px" }}>Description</th>
+                <th style={{ ...headerStyle, minWidth: "80px", maxWidth: "80px", whiteSpace: "normal" }}>Product Name</th>
+                <th style={{ ...headerStyle, minWidth: "67px", maxWidth: "67px", whiteSpace: "normal" }}>Description</th>
                 <th style={{ ...headerStyle, minWidth: "80px" }}>SKU</th>
                 <th style={{ ...headerStyle, minWidth: "90px" }}>Category</th>
                 <th style={{ ...headerStyle, minWidth: "100px" }}>Sizes</th>
@@ -468,8 +473,8 @@ export default function InventoryTable() {
                         </div>
                       </td>
 
-                      {renderEditableCell(item, "name", "Product name", "160px")}
-                      {renderEditableCell(item, "description", "Product description for storefront", "200px")}
+                      {renderEditableCell(item, "name", "Product name", "80px", true)}
+                      {renderEditableCell(item, "description", "Product description for storefront", "67px", true)}
                       {renderEditableCell(item, "sku", "SKU", "80px")}
 
                       {/* Category (dropdown) */}
