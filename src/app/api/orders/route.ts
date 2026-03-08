@@ -6,7 +6,7 @@ const INVENTORY_BLOB_KEY = "inventory.json";
 
 interface OrderRecord {
   id: string;
-  items: { name: string; price: number; quantity: number; size?: string; merchId?: string }[];
+  items: { name: string; price: number; quantity: number; size?: string; color?: string; gender?: string; merchId?: string }[];
   shipping: { name: string; address: string; city: string; state: string; zip: string };
   email: string;
   paymentMethod: string;

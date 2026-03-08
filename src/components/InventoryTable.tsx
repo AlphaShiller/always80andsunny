@@ -18,6 +18,7 @@ interface InventoryItem {
   priceSol?: number;
   requirements?: string;
   description?: string;
+  colors?: string;
   sku?: string;
   status: "active" | "draft" | "out_of_stock";
   createdAt: string;
@@ -45,7 +46,7 @@ export default function InventoryTable() {
   const [newItem, setNewItem] = useState({
     name: "", category: "apparel" as const, sizes: "", gender: "unisex",
     quantity: 0, weight: "", dimensions: "", cost: 0, price: 0, priceSol: 0,
-    requirements: "", description: "", sku: "",
+    requirements: "", description: "", colors: "", sku: "",
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
@@ -103,7 +104,7 @@ export default function InventoryTable() {
         setNewItem({
           name: "", category: "apparel", sizes: "", gender: "unisex",
           quantity: 0, weight: "", dimensions: "", cost: 0, price: 0, priceSol: 0,
-          requirements: "", description: "", sku: "",
+          requirements: "", description: "", colors: "", sku: "",
         });
         setShowAddRow(false);
       }
@@ -366,6 +367,7 @@ export default function InventoryTable() {
               { key: "weight", label: "Weight", placeholder: "1.2 lbs", type: "text" },
               { key: "dimensions", label: "Dimensions", placeholder: "10×8×4 in", type: "text" },
               { key: "requirements", label: "Requirements", placeholder: "e.g. Keep dry", type: "text" },
+              { key: "colors", label: "Colors", placeholder: "Red, Blue, Black", type: "text" },
               { key: "description", label: "Description", placeholder: "Product description...", type: "text" },
             ].map((f) => (
               <div key={f.key}>
@@ -415,6 +417,7 @@ export default function InventoryTable() {
                 <th style={{ ...headerStyle, minWidth: "80px" }}>SKU</th>
                 <th style={{ ...headerStyle, minWidth: "90px" }}>Category</th>
                 <th style={{ ...headerStyle, minWidth: "100px" }}>Sizes</th>
+                <th style={{ ...headerStyle, minWidth: "120px" }}>Colors</th>
                 <th style={{ ...headerStyle, minWidth: "80px" }}>Gender</th>
                 <th style={{ ...headerStyle, minWidth: "60px", textAlign: "right" }}>Qty</th>
                 <th style={{ ...headerStyle, minWidth: "80px", textAlign: "right" }}>Cost</th>
@@ -430,7 +433,7 @@ export default function InventoryTable() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={16} style={{ ...cellStyle, textAlign: "center", padding: "40px 12px" }}>
+                  <td colSpan={17} style={{ ...cellStyle, textAlign: "center", padding: "40px 12px" }}>
                     <div>
                       <p className="text-lg mb-1" style={{ color: COLORS.midGray }}>
                         {items.length === 0 ? "No products yet" : "No matching products"}
@@ -490,6 +493,7 @@ export default function InventoryTable() {
                       </td>
 
                       {renderEditableCell(item, "sizes", "S, M, L, XL", "100px")}
+                      {renderEditableCell(item, "colors", "Red, Blue, Black", "120px")}
                       {renderEditableCell(item, "gender", "unisex", "80px")}
 
                       {/* Quantity */}

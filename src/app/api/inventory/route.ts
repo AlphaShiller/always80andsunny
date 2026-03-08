@@ -19,6 +19,7 @@ interface InventoryRecord {
   priceSol?: number;
   requirements?: string;
   description?: string;
+  colors?: string;
   sku?: string;
   status: string;
   createdAt: string;
@@ -88,6 +89,7 @@ export async function POST(req: NextRequest) {
       priceSol: body.priceSol || 0,
       requirements: body.requirements || "",
       description: body.description || "",
+      colors: body.colors || "",
       sku: body.sku || "",
       status: "active",
       createdAt: new Date().toISOString(),
@@ -124,7 +126,7 @@ export async function PATCH(req: NextRequest) {
     const updatableFields = [
       "name", "category", "imageUrl", "sizes", "gender", "quantity",
       "weight", "dimensions", "cost", "price", "priceSol", "requirements",
-      "description", "sku", "status",
+      "description", "colors", "sku", "status",
     ];
 
     for (const field of updatableFields) {

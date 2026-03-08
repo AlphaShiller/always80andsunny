@@ -159,6 +159,7 @@ interface MerchItem {
   weight?: string;
   dimensions?: string;
   requirements?: string;
+  colors?: string[];
   status?: string;
 }
 
@@ -794,9 +795,10 @@ function MerchCard({ item, onClick }: { item: MerchItem; onClick: () => void }) 
 function MerchDetailModal({ item, onClose, onAddToCart }: {
   item: MerchItem;
   onClose: () => void;
-  onAddToCart: (item: MerchItem, size?: string, gender?: string, quantity?: number) => void;
+  onAddToCart: (item: MerchItem, size?: string, gender?: string, quantity?: number, color?: string) => void;
 }) {
   const [selectedSize, setSelectedSize] = useState(item.sizes?.[2] || "");
+  const [selectedColor, setSelectedColor] = useState(item.colors?.[0] || "");
   const [gender, setGender] = useState<"mens" | "womens" | "unisex">("unisex");
   const [quantity, setQuantity] = useState(1);
 
@@ -869,6 +871,29 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
             </div>
           )}
 
+          {/* Color selection */}
+          {item.colors && item.colors.length > 0 && (
+            <div className="mb-4">
+              <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: COLORS.lightText }}>Color</label>
+              <div className="flex gap-2 flex-wrap">
+                {item.colors.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setSelectedColor(c)}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer transition-all capitalize"
+                    style={{
+                      backgroundColor: selectedColor === c ? COLORS.teal : "#E8F0FE",
+                      color: selectedColor === c ? "white" : COLORS.lightText,
+                      border: `1px solid ${selectedColor === c ? COLORS.teal : "#CBD5E1"}`,
+                    }}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Quantity */}
           <div className="mb-5">
             <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: COLORS.lightText }}>Quantity</label>
@@ -889,7 +914,7 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
 
           {/* Add to Cart button */}
           <button
-            onClick={() => { onAddToCart(item, selectedSize || undefined, gender, quantity); onClose(); }}
+            onClick={() => { onAddToCart(item, selectedSize || undefined, gender, quantity, selectedColor || undefined); onClose(); }}
             className="w-full py-3 rounded-lg font-bold text-white cursor-pointer transition-all hover:opacity-90 text-base"
             style={{ backgroundColor: COLORS.purple }}
           >
@@ -1055,6 +1080,8 @@ function RotatingHeroBanner({ merch, onShopNow }: { merch: MerchItem[]; onShopNo
 interface CartItem {
   merch: MerchItem;
   size?: string;
+  color?: string;
+  gender?: string;
   quantity: number;
 }
 
@@ -1090,7 +1117,7 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: cart.map((c) => ({ name: c.merch.name, price: c.merch.price, quantity: c.quantity, size: c.size, merchId: c.merch.id })),
+          items: cart.map((c) => ({ name: c.merch.name, price: c.merch.price, quantity: c.quantity, size: c.size, color: c.color, gender: c.gender, merchId: c.merch.id })),
           shipping: { name: shipping.name, address: shipping.address, city: shipping.city, state: shipping.state, zip: shipping.zip },
           email: shipping.email,
           paymentMethod: "card",
@@ -1132,7 +1159,11 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
                       <span className="text-2xl">{item.merch.emoji}</span>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-slate-900">{item.merch.name}</p>
-                        {item.size && <p className="text-xs" style={{ color: COLORS.midGray }}>Size: {item.size}</p>}
+                        {(item.size || item.color || item.gender) && (
+                          <p className="text-xs" style={{ color: COLORS.midGray }}>
+                            {[item.gender && `${item.gender === "mens" ? "Men's" : item.gender === "womens" ? "Women's" : "Unisex"}`, item.size && `Size: ${item.size}`, item.color && `Color: ${item.color}`].filter(Boolean).join(" / ")}
+                          </p>
+                        )}
                         <p className="text-sm font-bold" style={{ color: COLORS.teal }}>${(item.merch.price * item.quantity).toFixed(2)}</p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -1346,7 +1377,7 @@ function Always80AppInner() {
         if (data.items && data.items.length > 0) {
           const liveItems: MerchItem[] = data.items
             .filter((inv: { status?: string; quantity?: number }) => inv.status === "active" && (inv.quantity ?? 0) > 0)
-            .map((inv: { id: string; name: string; price: number; priceSol?: number; category?: string; description?: string; imageUrl?: string; sizes?: string; gender?: string; weight?: string; dimensions?: string; requirements?: string; status?: string }) => ({
+            .map((inv: { id: string; name: string; price: number; priceSol?: number; category?: string; description?: string; imageUrl?: string; sizes?: string; gender?: string; weight?: string; dimensions?: string; requirements?: string; colors?: string; status?: string }) => ({
               id: inv.id,
               name: inv.name,
               price: inv.price,
@@ -1360,6 +1391,7 @@ function Always80AppInner() {
               weight: inv.weight || undefined,
               dimensions: inv.dimensions || undefined,
               requirements: inv.requirements || undefined,
+              colors: inv.colors ? inv.colors.split(",").map((s: string) => s.trim()).filter(Boolean) : undefined,
               status: inv.status || "active",
             }));
           setMerch(liveItems.length > 0 ? liveItems : DEFAULT_MERCH);
@@ -1401,15 +1433,15 @@ function Always80AppInner() {
     setPosts((prev) => [post, ...prev]);
   };
 
-  const handleAddToCart = (item: MerchItem, size?: string, _gender?: string, quantity?: number) => {
+  const handleAddToCart = (item: MerchItem, size?: string, gender?: string, quantity?: number, color?: string) => {
     setCart((prev) => {
-      const existing = prev.findIndex((c) => c.merch.id === item.id && c.size === size);
+      const existing = prev.findIndex((c) => c.merch.id === item.id && c.size === size && c.color === color && c.gender === gender);
       if (existing >= 0) {
         const updated = [...prev];
         updated[existing].quantity += (quantity || 1);
         return updated;
       }
-      return [...prev, { merch: item, size, quantity: quantity || 1 }];
+      return [...prev, { merch: item, size, color, gender, quantity: quantity || 1 }];
     });
     setShowCart(true);
   };

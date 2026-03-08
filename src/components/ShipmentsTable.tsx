@@ -8,6 +8,8 @@ interface OrderItem {
   price: number;
   quantity: number;
   size?: string;
+  color?: string;
+  gender?: string;
 }
 
 interface Order {
@@ -392,8 +394,16 @@ export default function ShipmentsTable() {
                           {order.items.map((item, i) => (
                             <p key={i} className="text-xs">
                               <span style={{ color: "#0A1628" }}>{item.name}</span>
-                              {item.size && (
-                                <span style={{ color: "#64748B" }}> ({item.size})</span>
+                              {(item.gender || item.size || item.color) && (
+                                <span style={{ color: "#64748B" }}>
+                                  {" ("}
+                                  {[
+                                    item.gender && (item.gender === "mens" ? "Men's" : item.gender === "womens" ? "Women's" : "Unisex"),
+                                    item.size,
+                                    item.color,
+                                  ].filter(Boolean).join(", ")}
+                                  {")"}
+                                </span>
                               )}
                               <span style={{ color: COLORS.teal }}> ×{item.quantity}</span>
                             </p>
