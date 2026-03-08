@@ -775,11 +775,11 @@ function MerchCard({ item, onClick }: { item: MerchItem; onClick: () => void }) 
       style={{ backgroundColor: COLORS.cardBg, borderColor: "#CBD5E1" }}
     >
       {item.imageUrl ? (
-        <div className="w-full h-64 overflow-hidden rounded-t-xl" style={{ backgroundColor: "#E8F0FE" }}>
-          <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+        <div className="overflow-hidden rounded-t-xl" style={{ width: "100%", height: "16rem", backgroundColor: "#E8F0FE" }}>
+          <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </div>
       ) : (
-        <div className="text-9xl text-center py-16 rounded-t-xl" style={{ backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
+        <div className="text-center rounded-t-xl" style={{ fontSize: "8rem", padding: "4rem 0", backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
       )}
       <div className="p-5">
         <h3 className="text-slate-900 font-bold text-base leading-tight mb-1">{item.name}</h3>
@@ -802,14 +802,14 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.4)" }} onClick={onClose}>
-      <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "white" }} onClick={(e) => e.stopPropagation()}>
+      <div className="rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "white", width: "100%", maxWidth: "28rem" }} onClick={(e) => e.stopPropagation()}>
         {/* Large image area */}
         {item.imageUrl ? (
-          <div className="w-full h-72 overflow-hidden" style={{ backgroundColor: "#E8F0FE" }}>
-            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+          <div className="overflow-hidden" style={{ width: "100%", height: "18rem", backgroundColor: "#E8F0FE" }}>
+            <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
         ) : (
-          <div className="text-9xl text-center py-16" style={{ backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
+          <div className="text-center" style={{ fontSize: "8rem", padding: "4rem 0", backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
         )}
 
         <div className="p-6">
