@@ -112,19 +112,19 @@ export default function CreatePostForm({
   };
 
   const inputStyle = {
-    backgroundColor: "#150F28",
-    color: COLORS.lightText,
-    border: "1px solid #2D2550",
+    backgroundColor: "#FFFFFF",
+    color: "#0A1628",
+    border: "1px solid #CBD5E1",
   };
 
   return (
-    <div className="rounded-xl p-5" style={{ backgroundColor: COLORS.cardBg }}>
-      <h3 className="text-white font-bold mb-4">Create Post</h3>
+    <div className="rounded-xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #CBD5E1" }}>
+      <h3 className="font-bold mb-4" style={{ color: "#0A1628" }}>Create Post</h3>
 
       <div className="space-y-3">
         {/* === MEDIA PREVIEW AT TOP === */}
         {(imagePreview || youtubeId) && (
-          <div className="rounded-lg overflow-hidden border" style={{ borderColor: "#2D2550" }}>
+          <div className="rounded-lg overflow-hidden border" style={{ borderColor: "#CBD5E1" }}>
             {youtubeId && !imagePreview ? (
               <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
                 <iframe
@@ -179,7 +179,7 @@ export default function CreatePostForm({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all hover:opacity-80"
-            style={{ backgroundColor: "#2D2550", color: COLORS.lightText }}
+            style={{ backgroundColor: "#F1F5F9", color: "#334155" }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
