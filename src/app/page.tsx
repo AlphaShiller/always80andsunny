@@ -1429,9 +1429,9 @@ function Always80AppInner() {
       </div>
 
       {/* Nav — sticky */}
-      <nav className="border-b px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40 shadow-sm" style={{ borderColor: "#CBD5E1", backgroundColor: "rgba(255, 255, 255, 0.97)", backdropFilter: "blur(12px)" }}>
+      <nav className="border-b px-4 sm:px-6 py-2 flex items-center justify-between sticky top-0 z-40 shadow-sm" style={{ borderColor: "#CBD5E1", backgroundColor: "rgba(255, 255, 255, 0.97)", backdropFilter: "blur(12px)" }}>
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView("storefront")}>
-          <img src="/logo.png" alt="Always 80 and Sunny" className="h-[80px] w-auto rounded-lg" />
+          <img src="/logo.png" alt="Always 80 and Sunny" className="h-[40px] w-auto rounded-lg" />
           <div className="hidden sm:flex flex-col">
             <span className="text-base font-black uppercase tracking-wider" style={{ color: "#0A1628", lineHeight: "1.2" }}>Custom Baits</span>
             <span className="text-base font-black uppercase tracking-wider" style={{ color: "#0A1628", lineHeight: "1.2" }}>& Tackle</span>
