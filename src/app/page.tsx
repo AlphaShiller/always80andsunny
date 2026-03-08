@@ -155,6 +155,7 @@ interface MerchItem {
   emoji: string;
   sizes?: string[];
   imageUrl?: string;
+  backImageUrl?: string;
   gender?: string;
   weight?: string;
   dimensions?: string;
@@ -795,24 +796,65 @@ function MerchCard({ item, onClick }: { item: MerchItem; onClick: () => void }) 
 function MerchDetailModal({ item, onClose, onAddToCart }: {
   item: MerchItem;
   onClose: () => void;
-  onAddToCart: (item: MerchItem, size?: string, gender?: string, quantity?: number, color?: string) => void;
+  onAddToCart: (item: MerchItem, size?: string, gender?: string, quantity?: number, color?: string, goToCheckout?: boolean) => void;
 }) {
   const [selectedSize, setSelectedSize] = useState(item.sizes?.[2] || "");
   const [selectedColor, setSelectedColor] = useState(item.colors?.[0] || "");
   const [gender, setGender] = useState<"mens" | "womens" | "unisex">("unisex");
   const [quantity, setQuantity] = useState(1);
+  const [activeImage, setActiveImage] = useState<"front" | "back">("front");
+
+  const frontImage = item.imageUrl;
+  const backImage = item.backImageUrl;
+  const displayImage = activeImage === "back" && backImage ? backImage : frontImage;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.4)" }} onClick={onClose}>
-      <div className="rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "white", width: "100%", maxWidth: "28rem" }} onClick={(e) => e.stopPropagation()}>
-        {/* Large image area */}
-        {item.imageUrl ? (
-          <div className="overflow-hidden" style={{ width: "100%", height: "18rem", backgroundColor: "#E8F0FE" }}>
-            <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      <div className="rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "white", width: "100%", maxWidth: "36rem" }} onClick={(e) => e.stopPropagation()}>
+        {/* Image area with thumbnails */}
+        <div className="flex" style={{ backgroundColor: "#E8F0FE" }}>
+          {/* Thumbnail column — top left */}
+          {(frontImage || backImage) && (
+            <div className="flex flex-col gap-2 p-3" style={{ minWidth: "72px" }}>
+              {frontImage && (
+                <div
+                  className="rounded-lg overflow-hidden cursor-pointer"
+                  style={{
+                    width: "60px",
+                    height: "60px",
+                    border: activeImage === "front" ? `2px solid ${COLORS.teal}` : "2px solid #CBD5E1",
+                    opacity: activeImage === "front" ? 1 : 0.6,
+                  }}
+                  onClick={() => setActiveImage("front")}
+                >
+                  <img src={frontImage} alt="Front" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+              )}
+              {backImage && (
+                <div
+                  className="rounded-lg overflow-hidden cursor-pointer"
+                  style={{
+                    width: "60px",
+                    height: "60px",
+                    border: activeImage === "back" ? `2px solid ${COLORS.teal}` : "2px solid #CBD5E1",
+                    opacity: activeImage === "back" ? 1 : 0.6,
+                  }}
+                  onClick={() => setActiveImage("back")}
+                >
+                  <img src={backImage} alt="Back" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+              )}
+            </div>
+          )}
+          {/* Main image */}
+          <div className="flex-1 overflow-hidden" style={{ height: "18rem" }}>
+            {displayImage ? (
+              <img src={displayImage} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center" style={{ fontSize: "8rem" }}>{item.emoji}</div>
+            )}
           </div>
-        ) : (
-          <div className="text-center" style={{ fontSize: "8rem", padding: "4rem 0", backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
-        )}
+        </div>
 
         <div className="p-6">
           <div className="flex justify-between items-start mb-2">
@@ -912,14 +954,23 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
             </div>
           </div>
 
-          {/* Add to Cart button */}
-          <button
-            onClick={() => { onAddToCart(item, selectedSize || undefined, gender, quantity, selectedColor || undefined); onClose(); }}
-            className="w-full py-3 rounded-lg font-bold text-white cursor-pointer transition-all hover:opacity-90 text-base"
-            style={{ backgroundColor: COLORS.purple }}
-          >
-            Add to Cart — ${(item.price * quantity).toFixed(2)}
-          </button>
+          {/* Action buttons — Continue Shopping or Go to Checkout */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => { onAddToCart(item, selectedSize || undefined, gender, quantity, selectedColor || undefined, false); onClose(); }}
+              className="flex-1 py-3 rounded-lg font-bold cursor-pointer transition-all hover:opacity-90 text-sm"
+              style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: `1px solid #CBD5E1` }}
+            >
+              Add to Cart & Continue Shopping
+            </button>
+            <button
+              onClick={() => { onAddToCart(item, selectedSize || undefined, gender, quantity, selectedColor || undefined, true); onClose(); }}
+              className="flex-1 py-3 rounded-lg font-bold text-white cursor-pointer transition-all hover:opacity-90 text-sm"
+              style={{ backgroundColor: COLORS.purple }}
+            >
+              Add to Cart & Checkout — ${(item.price * quantity).toFixed(2)}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1381,7 +1432,7 @@ function Always80AppInner() {
         if (data.items && data.items.length > 0) {
           const liveItems: MerchItem[] = data.items
             .filter((inv: { status?: string; quantity?: number }) => inv.status === "active" && (inv.quantity ?? 0) > 0)
-            .map((inv: { id: string; name: string; price: number; priceSol?: number; category?: string; description?: string; imageUrl?: string; sizes?: string; gender?: string; weight?: string; dimensions?: string; requirements?: string; colors?: string; status?: string }) => ({
+            .map((inv: { id: string; name: string; price: number; priceSol?: number; category?: string; description?: string; imageUrl?: string; backImageUrl?: string; sizes?: string; gender?: string; weight?: string; dimensions?: string; requirements?: string; colors?: string; status?: string }) => ({
               id: inv.id,
               name: inv.name,
               price: inv.price,
@@ -1391,6 +1442,7 @@ function Always80AppInner() {
               emoji: categoryEmoji(inv.category || ""),
               sizes: inv.sizes ? inv.sizes.split(",").map((s: string) => s.trim()).filter(Boolean) : undefined,
               imageUrl: inv.imageUrl || undefined,
+              backImageUrl: inv.backImageUrl || undefined,
               gender: inv.gender || undefined,
               weight: inv.weight || undefined,
               dimensions: inv.dimensions || undefined,
@@ -1437,7 +1489,7 @@ function Always80AppInner() {
     setPosts((prev) => [post, ...prev]);
   };
 
-  const handleAddToCart = (item: MerchItem, size?: string, gender?: string, quantity?: number, color?: string) => {
+  const handleAddToCart = (item: MerchItem, size?: string, gender?: string, quantity?: number, color?: string, goToCheckout?: boolean) => {
     setCart((prev) => {
       const existing = prev.findIndex((c) => c.merch.id === item.id && c.size === size && c.color === color && c.gender === gender);
       if (existing >= 0) {
@@ -1447,7 +1499,9 @@ function Always80AppInner() {
       }
       return [...prev, { merch: item, size, color, gender, quantity: quantity || 1 }];
     });
-    setShowCart(true);
+    if (goToCheckout) {
+      setShowCart(true);
+    }
   };
 
   // Only show Dashboard tab if connected wallet is the creator/owner

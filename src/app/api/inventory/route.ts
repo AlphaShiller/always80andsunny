@@ -9,6 +9,7 @@ interface InventoryRecord {
   name: string;
   category: string;
   imageUrl?: string;
+  backImageUrl?: string;
   sizes?: string;
   gender?: string;
   quantity: number;
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
       name: body.name || "Untitled Product",
       category: body.category || "apparel",
       imageUrl: body.imageUrl || "",
+      backImageUrl: body.backImageUrl || "",
       sizes: body.sizes || "",
       gender: body.gender || "unisex",
       quantity: body.quantity || 0,
@@ -124,7 +126,7 @@ export async function PATCH(req: NextRequest) {
 
     // Apply updates
     const updatableFields = [
-      "name", "category", "imageUrl", "sizes", "gender", "quantity",
+      "name", "category", "imageUrl", "backImageUrl", "sizes", "gender", "quantity",
       "weight", "dimensions", "cost", "price", "priceSol", "requirements",
       "description", "colors", "sku", "status",
     ];

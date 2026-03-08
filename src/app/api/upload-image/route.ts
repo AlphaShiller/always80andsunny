@@ -6,14 +6,16 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const itemId = formData.get("itemId") as string | null;
+    const imageType = (formData.get("imageType") as string) || "front";
 
     if (!file || !itemId) {
       return NextResponse.json({ error: "file and itemId required" }, { status: 400 });
     }
 
-    // Generate a clean filename
+    // Generate a clean filename — include type suffix for back images
     const ext = file.name.split(".").pop() || "jpg";
-    const filename = `product-images/${itemId}.${ext}`;
+    const suffix = imageType === "back" ? "-back" : "";
+    const filename = `product-images/${itemId}${suffix}.${ext}`;
 
     // Upload to Vercel Blob
     const blob = await put(filename, file, {

@@ -8,6 +8,7 @@ interface InventoryItem {
   name: string;
   category: "apparel" | "tackle" | "accessory";
   imageUrl?: string;
+  backImageUrl?: string;
   sizes?: string;
   gender?: string;
   quantity: number;
@@ -50,6 +51,7 @@ export default function InventoryTable() {
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+  const [uploadType, setUploadType] = useState<"front" | "back">("front");
 
   const fetchItems = useCallback(async () => {
     try {
@@ -127,12 +129,13 @@ export default function InventoryTable() {
     }
   };
 
-  const handleImageUpload = async (itemId: string, file: File) => {
+  const handleImageUpload = async (itemId: string, file: File, type: "front" | "back" = "front") => {
     setUploadingFor(itemId);
     try {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("itemId", itemId);
+      formData.append("imageType", type);
 
       const uploadRes = await fetch("/api/upload-image", {
         method: "POST",
@@ -141,7 +144,8 @@ export default function InventoryTable() {
       const uploadData = await uploadRes.json();
 
       if (uploadData.url) {
-        await updateField(itemId, "imageUrl", uploadData.url);
+        const field = type === "back" ? "backImageUrl" : "imageUrl";
+        await updateField(itemId, field, uploadData.url);
       } else {
         console.error("Upload failed:", uploadData.error);
       }
@@ -288,7 +292,7 @@ export default function InventoryTable() {
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file && uploadingFor) {
-            handleImageUpload(uploadingFor, file);
+            handleImageUpload(uploadingFor, file, uploadType);
           }
           e.target.value = "";
         }}
@@ -411,7 +415,8 @@ export default function InventoryTable() {
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "1800px" }}>
             <thead>
               <tr>
-                <th style={{ ...headerStyle, minWidth: "60px" }}>Image</th>
+                <th style={{ ...headerStyle, minWidth: "60px" }}>Front</th>
+                <th style={{ ...headerStyle, minWidth: "60px" }}>Back</th>
                 <th style={{ ...headerStyle, minWidth: "80px", maxWidth: "80px", whiteSpace: "normal" }}>Product Name</th>
                 <th style={{ ...headerStyle, minWidth: "67px", maxWidth: "67px", whiteSpace: "normal" }}>Description</th>
                 <th style={{ ...headerStyle, minWidth: "80px" }}>SKU</th>
@@ -433,7 +438,7 @@ export default function InventoryTable() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={17} style={{ ...cellStyle, textAlign: "center", padding: "40px 12px" }}>
+                  <td colSpan={18} style={{ ...cellStyle, textAlign: "center", padding: "40px 12px" }}>
                     <div>
                       <p className="text-lg mb-1" style={{ color: COLORS.midGray }}>
                         {items.length === 0 ? "No products yet" : "No matching products"}
@@ -458,20 +463,38 @@ export default function InventoryTable() {
                       onMouseEnter={(e) => { if (!isSaving) (e.currentTarget as HTMLElement).style.backgroundColor = "#F8FAFC"; }}
                       onMouseLeave={(e) => { if (!isSaving) (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
                     >
-                      {/* Image */}
+                      {/* Front Image */}
                       <td style={{ ...cellStyle, minWidth: "60px", padding: "6px 8px" }}>
                         <div
                           className="w-12 h-12 rounded-lg overflow-hidden cursor-pointer flex items-center justify-center"
                           style={{ backgroundColor: "#F1F5F9", border: "1px dashed #CBD5E1" }}
-                          onClick={() => { setUploadingFor(item.id); fileInputRef.current?.click(); }}
-                          title="Click to upload image"
+                          onClick={() => { setUploadingFor(item.id); setUploadType("front"); fileInputRef.current?.click(); }}
+                          title="Click to upload front image"
                         >
-                          {uploadingFor === item.id ? (
+                          {uploadingFor === item.id && uploadType === "front" ? (
                             <span className="text-xs" style={{ color: COLORS.midGray }}>...</span>
                           ) : item.imageUrl ? (
                             <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                           ) : (
                             <span className="text-lg">📷</span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Back Image */}
+                      <td style={{ ...cellStyle, minWidth: "60px", padding: "6px 8px" }}>
+                        <div
+                          className="w-12 h-12 rounded-lg overflow-hidden cursor-pointer flex items-center justify-center"
+                          style={{ backgroundColor: "#F1F5F9", border: "1px dashed #CBD5E1" }}
+                          onClick={() => { setUploadingFor(item.id); setUploadType("back"); fileInputRef.current?.click(); }}
+                          title="Click to upload back image"
+                        >
+                          {uploadingFor === item.id && uploadType === "back" ? (
+                            <span className="text-xs" style={{ color: COLORS.midGray }}>...</span>
+                          ) : item.backImageUrl ? (
+                            <img src={item.backImageUrl} alt={`${item.name} back`} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-xs" style={{ color: "#94A3B8" }}>+ Back</span>
                           )}
                         </div>
                       </td>
