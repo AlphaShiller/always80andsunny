@@ -1071,8 +1071,12 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
   const [orderResult, setOrderResult] = useState<{ id: string } | null>(null);
   const [error, setError] = useState("");
 
-  const total = cart.reduce((sum, item) => sum + item.merch.price * item.quantity, 0);
-  const shippingCost = total >= 50 ? 0 : 5.99;
+  const subtotal = cart.reduce((sum, item) => sum + item.merch.price * item.quantity, 0);
+  // Estimate shipping client-side; actual cost is calculated server-side from inventory weights
+  const estimatedShipping = subtotal >= 50 ? 0 : 5.99;
+  const [actualShipping, setActualShipping] = useState<number | null>(null);
+  const shippingCost = actualShipping !== null ? actualShipping : estimatedShipping;
+  const total = subtotal;
 
   const handleSubmit = async () => {
     if (!shipping.name || !shipping.address || !shipping.city || !shipping.state || !shipping.zip || !shipping.email) {
@@ -1094,6 +1098,9 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
       });
       const data = await res.json();
       if (data.order) {
+        if (data.shippingCost !== undefined) {
+          setActualShipping(data.shippingCost);
+        }
         setOrderResult(data.order);
         setStep("confirm");
         onOrderComplete();
@@ -1138,10 +1145,10 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
                   ))}
                 </div>
                 <div className="border-t pt-3 space-y-1" style={{ borderColor: "#CBD5E1" }}>
-                  <div className="flex justify-between text-sm" style={{ color: COLORS.lightText }}><span>Subtotal</span><span>${total.toFixed(2)}</span></div>
-                  <div className="flex justify-between text-sm" style={{ color: COLORS.lightText }}><span>Shipping</span><span>{shippingCost === 0 ? <span style={{ color: COLORS.teal }}>FREE</span> : `$${shippingCost.toFixed(2)}`}</span></div>
-                  {total < 50 && <p className="text-xs" style={{ color: COLORS.midGray }}>Free shipping on orders over $50!</p>}
-                  <div className="flex justify-between text-lg font-black pt-2" style={{ color: "white" }}><span>Total</span><span style={{ color: COLORS.teal }}>${(total + shippingCost).toFixed(2)}</span></div>
+                  <div className="flex justify-between text-sm" style={{ color: COLORS.lightText }}><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+                  <div className="flex justify-between text-sm" style={{ color: COLORS.lightText }}><span>Shipping {actualShipping === null ? "(est.)" : ""}</span><span>{shippingCost === 0 ? <span style={{ color: COLORS.teal }}>FREE</span> : `$${shippingCost.toFixed(2)}`}</span></div>
+                  {subtotal < 50 && <p className="text-xs" style={{ color: COLORS.midGray }}>Free shipping on orders over $50!</p>}
+                  <div className="flex justify-between text-lg font-black pt-2" style={{ color: "white" }}><span>Total</span><span style={{ color: COLORS.teal }}>${(subtotal + shippingCost).toFixed(2)}</span></div>
                 </div>
                 <button onClick={() => setStep("shipping")} className="w-full mt-4 py-3 rounded-lg font-bold text-white cursor-pointer" style={{ backgroundColor: COLORS.purple }}>Proceed to Shipping</button>
               </>
@@ -1188,10 +1195,12 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
             </div>
             {error && <p className="text-red-400 text-sm mt-3">{error}</p>}
             <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: "#E8F0FE" }}>
-              <div className="flex justify-between text-sm font-bold text-slate-900"><span>Order Total</span><span style={{ color: COLORS.teal }}>${(total + shippingCost).toFixed(2)}</span></div>
+              <div className="flex justify-between text-sm text-slate-900"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+              <div className="flex justify-between text-sm text-slate-900"><span>Shipping (weight-based)</span><span>{shippingCost === 0 ? <span style={{ color: COLORS.teal }}>FREE</span> : `$${shippingCost.toFixed(2)}`}</span></div>
+              <div className="flex justify-between text-sm font-bold text-slate-900 pt-1 border-t mt-1" style={{ borderColor: "#CBD5E1" }}><span>Order Total</span><span style={{ color: COLORS.teal }}>${(subtotal + shippingCost).toFixed(2)}</span></div>
             </div>
             <button onClick={handleSubmit} disabled={submitting} className="w-full mt-4 py-3 rounded-lg font-bold text-white cursor-pointer disabled:opacity-50" style={{ backgroundColor: "#635BFF" }}>
-              {submitting ? "Placing Order..." : `Pay $${(total + shippingCost).toFixed(2)} with Card`}
+              {submitting ? "Placing Order..." : `Pay $${(subtotal + shippingCost).toFixed(2)} with Card`}
             </button>
           </>
         )}

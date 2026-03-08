@@ -11,6 +11,7 @@ interface OrderRecord {
   email: string;
   paymentMethod: string;
   total: number;
+  shippingCost?: number;
   status: string;
   labelGenerated: boolean;
   createdAt: string;
@@ -21,6 +22,47 @@ interface OrderRecord {
   shipmentStatus?: string;
   trackingNumber?: string;
   notes?: string;
+}
+
+interface InventoryItem {
+  id: string;
+  name: string;
+  weight?: string;
+  requirements?: string;
+  dimensions?: string;
+}
+
+// Parse weight string like "1.2 lbs", "0.5 lb", "8 oz" into a number in lbs
+function parseWeight(w: string): number {
+  if (!w) return 0;
+  const lower = w.toLowerCase().trim();
+  const num = parseFloat(lower);
+  if (isNaN(num)) return 0;
+  if (lower.includes("oz")) return num / 16;
+  return num; // default assume lbs
+}
+
+// Calculate shipping cost based on total weight
+// Free over $50 subtotal, otherwise weight-based rates
+function calculateShipping(totalWeightLbs: number, subtotal: number): number {
+  if (subtotal >= 50) return 0; // free shipping over $50
+  if (totalWeightLbs <= 0.5) return 4.99;
+  if (totalWeightLbs <= 1) return 5.99;
+  if (totalWeightLbs <= 3) return 7.99;
+  if (totalWeightLbs <= 5) return 9.99;
+  if (totalWeightLbs <= 10) return 12.99;
+  return 12.99 + Math.ceil((totalWeightLbs - 10) / 5) * 4.00; // $4 per additional 5 lbs
+}
+
+async function getInventory(): Promise<InventoryItem[]> {
+  try {
+    const { blobs } = await list({ prefix: INVENTORY_BLOB_KEY });
+    if (blobs.length === 0) return [];
+    const res = await fetch(blobs[0].url, { cache: "no-store" });
+    return await res.json();
+  } catch {
+    return [];
+  }
 }
 
 async function getOrders(): Promise<OrderRecord[]> {
@@ -56,19 +98,49 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    // Look up inventory to get weight, requirements, and dimensions for each item
+    const inventory = await getInventory();
+    let totalWeightLbs = 0;
+    const allRequirements: string[] = [];
+    const allDimensions: string[] = [];
+
+    for (const orderItem of items) {
+      if (!orderItem.merchId) continue;
+      const invItem = inventory.find((inv: InventoryItem) => inv.id === orderItem.merchId);
+      if (invItem) {
+        // Calculate total weight: item weight × quantity ordered
+        const itemWeight = parseWeight(invItem.weight || "");
+        totalWeightLbs += itemWeight * (orderItem.quantity || 1);
+
+        // Collect requirements (deduplicate)
+        if (invItem.requirements && !allRequirements.includes(invItem.requirements)) {
+          allRequirements.push(invItem.requirements);
+        }
+
+        // Collect dimensions
+        if (invItem.dimensions) {
+          allDimensions.push(`${orderItem.name}: ${invItem.dimensions}`);
+        }
+      }
+    }
+
+    const subtotal = items.reduce((sum: number, item: { price: number; quantity: number }) => sum + item.price * item.quantity, 0);
+    const shippingCost = calculateShipping(totalWeightLbs, subtotal);
+
     const order: OrderRecord = {
       id: `ORD-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
       items,
       shipping,
       email,
       paymentMethod: paymentMethod || "card",
-      total: items.reduce((sum: number, item: { price: number; quantity: number }) => sum + item.price * item.quantity, 0),
+      total: subtotal + shippingCost,
+      shippingCost,
       status: "confirmed",
       labelGenerated: false,
       createdAt: new Date().toISOString(),
-      weight: "",
-      dimensions: "",
-      requirements: "",
+      weight: totalWeightLbs > 0 ? `${totalWeightLbs.toFixed(2)} lbs` : "",
+      dimensions: allDimensions.length > 0 ? allDimensions.join("; ") : "",
+      requirements: allRequirements.length > 0 ? allRequirements.join("; ") : "",
       shipmentStatus: "Pending",
       trackingNumber: "",
       notes: "",
@@ -80,39 +152,34 @@ export async function POST(req: NextRequest) {
 
     // Deduct purchased quantities from inventory
     try {
-      const { blobs } = await list({ prefix: INVENTORY_BLOB_KEY });
-      if (blobs.length > 0) {
-        const invRes = await fetch(blobs[0].url, { cache: "no-store" });
-        const inventory = await invRes.json();
-        let inventoryUpdated = false;
+      let inventoryUpdated = false;
 
-        for (const orderItem of items) {
-          if (!orderItem.merchId) continue;
-          const invIdx = inventory.findIndex((inv: { id: string }) => inv.id === orderItem.merchId);
-          if (invIdx !== -1) {
-            const currentQty = inventory[invIdx].quantity || 0;
-            inventory[invIdx].quantity = Math.max(0, currentQty - (orderItem.quantity || 1));
-            inventory[invIdx].updatedAt = new Date().toISOString();
-            if (inventory[invIdx].quantity === 0) {
-              inventory[invIdx].status = "out_of_stock";
-            }
-            inventoryUpdated = true;
+      for (const orderItem of items) {
+        if (!orderItem.merchId) continue;
+        const invIdx = inventory.findIndex((inv: InventoryItem) => inv.id === orderItem.merchId);
+        if (invIdx !== -1) {
+          const invRecord = inventory[invIdx] as InventoryItem & { quantity?: number; status?: string; updatedAt?: string };
+          const currentQty = invRecord.quantity || 0;
+          invRecord.quantity = Math.max(0, currentQty - (orderItem.quantity || 1));
+          invRecord.updatedAt = new Date().toISOString();
+          if (invRecord.quantity === 0) {
+            invRecord.status = "out_of_stock";
           }
+          inventoryUpdated = true;
         }
+      }
 
-        if (inventoryUpdated) {
-          await put(INVENTORY_BLOB_KEY, JSON.stringify(inventory, null, 2), {
-        
-            access: "public",
-    addRandomSuffix: false, allowOverwrite: true,
-          });
-        }
+      if (inventoryUpdated) {
+        await put(INVENTORY_BLOB_KEY, JSON.stringify(inventory, null, 2), {
+          access: "public",
+          addRandomSuffix: false, allowOverwrite: true,
+        });
       }
     } catch (invErr) {
       console.error("Failed to update inventory quantities:", invErr);
     }
 
-    return NextResponse.json({ order });
+    return NextResponse.json({ order, shippingCost });
   } catch {
     return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
   }
