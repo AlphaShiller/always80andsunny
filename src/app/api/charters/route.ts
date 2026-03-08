@@ -34,7 +34,7 @@ async function saveBookings(bookings: Booking[]) {
   await put(BLOB_KEY, JSON.stringify(bookings, null, 2), {
 
     access: "public",
-    addRandomSuffix: false,
+    addRandomSuffix: false, allowOverwrite: true,
   });
 }
 

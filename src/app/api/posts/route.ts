@@ -20,7 +20,7 @@ async function writeBlob(key: string, data: unknown) {
   await put(key, JSON.stringify(data, null, 2), {
 
     access: "public",
-    addRandomSuffix: false,
+    addRandomSuffix: false, allowOverwrite: true,
   });
 }
 

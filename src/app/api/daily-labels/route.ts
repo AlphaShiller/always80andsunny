@@ -95,7 +95,7 @@ export async function GET() {
   const summaryBlob = await put(`labels/${summaryFilename}`, summaryHTML, {
 
     access: "public",
-    addRandomSuffix: false,
+    addRandomSuffix: false, allowOverwrite: true,
     contentType: "text/html",
   });
 

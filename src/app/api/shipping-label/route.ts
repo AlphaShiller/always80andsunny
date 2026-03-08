@@ -42,7 +42,7 @@ async function saveOrders(orders: Order[]) {
   await put(ORDERS_BLOB_KEY, JSON.stringify(orders, null, 2), {
 
     access: "public",
-    addRandomSuffix: false,
+    addRandomSuffix: false, allowOverwrite: true,
   });
 }
 
@@ -137,7 +137,7 @@ export async function GET(req: NextRequest) {
   await put(`${LABELS_BLOB_PREFIX}${filename}`, html, {
 
     access: "public",
-    addRandomSuffix: false,
+    addRandomSuffix: false, allowOverwrite: true,
     contentType: "text/html",
   });
 
@@ -163,7 +163,7 @@ export async function POST() {
     const blob = await put(`${LABELS_BLOB_PREFIX}${filename}`, html, {
   
       access: "public",
-    addRandomSuffix: false,
+    addRandomSuffix: false, allowOverwrite: true,
       contentType: "text/html",
     });
     order.labelGenerated = true;

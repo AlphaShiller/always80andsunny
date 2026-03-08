@@ -24,7 +24,7 @@ async function saveSubscribers(subs: Subscriber[]) {
   await put(BLOB_KEY, JSON.stringify(subs, null, 2), {
 
     access: "public",
-    addRandomSuffix: false,
+    addRandomSuffix: false, allowOverwrite: true,
   });
 }
 
