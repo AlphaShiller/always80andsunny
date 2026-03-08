@@ -1431,7 +1431,7 @@ function Always80AppInner() {
       {/* Nav — sticky */}
       <nav className="border-b px-4 sm:px-6 py-2 flex items-center justify-between sticky top-0 z-40 shadow-sm" style={{ borderColor: "#CBD5E1", backgroundColor: "rgba(255, 255, 255, 0.97)", backdropFilter: "blur(12px)" }}>
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView("storefront")}>
-          <img src="/logo.png" alt="Always 80 and Sunny" className="h-[40px] w-auto rounded-lg" />
+          <img src="/logo.png" alt="Always 80 and Sunny" className="rounded-lg" style={{ height: "40px", width: "auto" }} />
           <div className="hidden sm:flex flex-col">
             <span className="text-base font-black uppercase tracking-wider" style={{ color: "#0A1628", lineHeight: "1.2" }}>Custom Baits</span>
             <span className="text-base font-black uppercase tracking-wider" style={{ color: "#0A1628", lineHeight: "1.2" }}>& Tackle</span>
@@ -1981,7 +1981,7 @@ function Always80AppInner() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             {/* Brand */}
             <div>
-              <img src="/logo.png" alt="Always 80 and Sunny" className="h-16 w-auto mb-3" />
+              <img src="/logo.png" alt="Always 80 and Sunny" className="mb-3" style={{ height: "64px", width: "auto" }} />
               <p className="text-xs" style={{ color: COLORS.midGray }}>
                 Custom baits, premium tackle, and unforgettable fishing charters — powered by Solana.
               </p>
