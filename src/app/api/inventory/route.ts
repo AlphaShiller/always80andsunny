@@ -34,7 +34,8 @@ async function readItems(): Promise<InventoryRecord[]> {
       const seeded = seedInventory as InventoryRecord[];
       await put(BLOB_KEY, JSON.stringify(seeded, null, 2), {
     
-        addRandomSuffix: false,
+        access: "private",
+    addRandomSuffix: false,
       });
       return seeded;
     }
@@ -51,6 +52,7 @@ async function readItems(): Promise<InventoryRecord[]> {
 async function writeItems(items: InventoryRecord[]) {
   await put(BLOB_KEY, JSON.stringify(items, null, 2), {
 
+    access: "private",
     addRandomSuffix: false,
   });
 }
