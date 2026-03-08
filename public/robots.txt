@@ -1,0 +1,6 @@
+# Always 80 and Sunny — Robots
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://always80andsunny.store/sitemap.xml

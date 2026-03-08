@@ -1,0 +1,17 @@
+{
+  "name": "Always 80 and Sunny",
+  "short_name": "80&Sunny",
+  "description": "Premium custom baits, tackle, and fishing charters on Solana.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F0A1E",
+  "theme_color": "#0F0A1E",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
