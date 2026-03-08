@@ -23,7 +23,7 @@ async function getBookings(): Promise<Booking[]> {
   try {
     const { blobs } = await list({ prefix: BLOB_KEY });
     if (blobs.length === 0) return [];
-    const res = await fetch(blobs[0].downloadUrl, { cache: "no-store" });
+    const res = await fetch(blobs[0].url, { cache: "no-store" });
     return await res.json();
   } catch {
     return [];
@@ -33,7 +33,7 @@ async function getBookings(): Promise<Booking[]> {
 async function saveBookings(bookings: Booking[]) {
   await put(BLOB_KEY, JSON.stringify(bookings, null, 2), {
 
-    access: "private" as any,
+    access: "public",
     addRandomSuffix: false,
   });
 }

@@ -24,7 +24,7 @@ async function getOrders(): Promise<Order[]> {
   try {
     const { blobs } = await list({ prefix: ORDERS_BLOB_KEY });
     if (blobs.length === 0) return [];
-    const res = await fetch(blobs[0].downloadUrl, { cache: "no-store" });
+    const res = await fetch(blobs[0].url, { cache: "no-store" });
     return await res.json();
   } catch {
     return [];
@@ -94,7 +94,7 @@ export async function GET() {
   const summaryFilename = `daily-summary-${today}.html`;
   const summaryBlob = await put(`labels/${summaryFilename}`, summaryHTML, {
 
-    access: "private" as any,
+    access: "public",
     addRandomSuffix: false,
     contentType: "text/html",
   });
@@ -104,7 +104,7 @@ export async function GET() {
     totalOrders: orders.length,
     todaysOrders: todaysOrders.length,
     pendingLabels: pendingLabels.length,
-    summaryUrl: summaryBlob.downloadUrl,
+    summaryUrl: summaryBlob.url,
     labelLinks: pendingLabels.map((o: Order) => ({
       orderId: o.id,
       customer: o.shipping.name,
