@@ -42,6 +42,37 @@ export default function ShipmentsTable() {
   const [editValue, setEditValue] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [generatingLabel, setGeneratingLabel] = useState<string | null>(null);
+
+  const printLabel = async (orderId: string) => {
+    setGeneratingLabel(orderId);
+    try {
+      const url = `/api/shipping-label?orderId=${encodeURIComponent(orderId)}`;
+      window.open(url, "_blank");
+      // Refresh orders to pick up labelGenerated change
+      setTimeout(() => fetchOrders(), 1500);
+    } catch (err) {
+      console.error("Failed to generate label:", err);
+    }
+    setGeneratingLabel(null);
+  };
+
+  const printAllPending = async () => {
+    setGeneratingLabel("all");
+    try {
+      const res = await fetch("/api/shipping-label", { method: "POST" });
+      const data = await res.json();
+      if (data.labels && data.labels.length > 0) {
+        for (const labelUrl of data.labels) {
+          window.open(labelUrl, "_blank");
+        }
+      }
+      setTimeout(() => fetchOrders(), 1500);
+    } catch (err) {
+      console.error("Failed to generate labels:", err);
+    }
+    setGeneratingLabel(null);
+  };
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -235,6 +266,14 @@ export default function ShipmentsTable() {
             }}
           />
           <button
+            onClick={printAllPending}
+            disabled={generatingLabel === "all"}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer hover:opacity-80 text-white disabled:opacity-50"
+            style={{ backgroundColor: COLORS.teal }}
+          >
+            {generatingLabel === "all" ? "Generating..." : "Print All Pending Labels"}
+          </button>
+          <button
             onClick={fetchOrders}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer hover:opacity-80"
             style={{ backgroundColor: "#E2E8F0", color: COLORS.lightText }}
@@ -287,13 +326,14 @@ export default function ShipmentsTable() {
                 <th style={{ ...headerStyle, minWidth: "120px" }}>Requirements</th>
                 <th style={{ ...headerStyle, minWidth: "110px" }}>Status</th>
                 <th style={{ ...headerStyle, minWidth: "140px" }}>Tracking</th>
-                <th style={{ ...headerStyle, minWidth: "160px" }}>Actions / Notes</th>
+                <th style={{ ...headerStyle, minWidth: "100px" }}>Label</th>
+                <th style={{ ...headerStyle, minWidth: "160px" }}>Notes</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={10} style={{ ...cellStyle, textAlign: "center", padding: "40px 12px" }}>
+                  <td colSpan={11} style={{ ...cellStyle, textAlign: "center", padding: "40px 12px" }}>
                     <div>
                       <p className="text-lg mb-1" style={{ color: COLORS.midGray }}>
                         {orders.length === 0 ? "No orders yet" : "No matching orders"}
@@ -388,6 +428,19 @@ export default function ShipmentsTable() {
                       </td>
 
                       {renderEditableCell(order, "trackingNumber", "Enter tracking #", "140px")}
+
+                      {/* Print Label */}
+                      <td style={{ ...cellStyle, padding: "6px 8px", minWidth: "100px" }}>
+                        <button
+                          onClick={() => printLabel(order.id)}
+                          disabled={generatingLabel === order.id}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer hover:opacity-80 disabled:opacity-50"
+                          style={{ backgroundColor: "#DBEAFE", color: "#1E40AF", border: "1px solid #93C5FD" }}
+                        >
+                          {generatingLabel === order.id ? "..." : "Print Label"}
+                        </button>
+                      </td>
+
                       {renderEditableCell(order, "notes", "Add notes...", "160px")}
                     </tr>
                   );
