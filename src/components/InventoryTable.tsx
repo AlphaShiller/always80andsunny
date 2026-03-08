@@ -129,16 +129,25 @@ export default function InventoryTable() {
   const handleImageUpload = async (itemId: string, file: File) => {
     setUploadingFor(itemId);
     try {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const dataUrl = reader.result as string;
-        await updateField(itemId, "imageUrl", dataUrl);
-        setUploadingFor(null);
-      };
-      reader.readAsDataURL(file);
-    } catch {
-      setUploadingFor(null);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("itemId", itemId);
+
+      const uploadRes = await fetch("/api/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+      const uploadData = await uploadRes.json();
+
+      if (uploadData.url) {
+        await updateField(itemId, "imageUrl", uploadData.url);
+      } else {
+        console.error("Upload failed:", uploadData.error);
+      }
+    } catch (err) {
+      console.error("Image upload error:", err);
     }
+    setUploadingFor(null);
   };
 
   const startEdit = (itemId: string, field: string, currentValue: string) => {
