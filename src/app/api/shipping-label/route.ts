@@ -41,7 +41,7 @@ async function getOrders(): Promise<Order[]> {
 async function saveOrders(orders: Order[]) {
   await put(ORDERS_BLOB_KEY, JSON.stringify(orders, null, 2), {
 
-    access: "private" as "public",
+    access: "private" as any,
     addRandomSuffix: false,
   });
 }
@@ -136,7 +136,7 @@ export async function GET(req: NextRequest) {
   const filename = `label-${order.id}.html`;
   await put(`${LABELS_BLOB_PREFIX}${filename}`, html, {
 
-    access: "private" as "public",
+    access: "private" as any,
     addRandomSuffix: false,
     contentType: "text/html",
   });
@@ -162,7 +162,7 @@ export async function POST() {
     const filename = `label-${order.id}.html`;
     const blob = await put(`${LABELS_BLOB_PREFIX}${filename}`, html, {
   
-      access: "private" as "public",
+      access: "private" as any,
     addRandomSuffix: false,
       contentType: "text/html",
     });

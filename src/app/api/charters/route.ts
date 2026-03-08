@@ -33,7 +33,7 @@ async function getBookings(): Promise<Booking[]> {
 async function saveBookings(bookings: Booking[]) {
   await put(BLOB_KEY, JSON.stringify(bookings, null, 2), {
 
-    access: "private" as "public",
+    access: "private" as any,
     addRandomSuffix: false,
   });
 }

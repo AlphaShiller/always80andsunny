@@ -94,7 +94,7 @@ export async function GET() {
   const summaryFilename = `daily-summary-${today}.html`;
   const summaryBlob = await put(`labels/${summaryFilename}`, summaryHTML, {
 
-    access: "private" as "public",
+    access: "private" as any,
     addRandomSuffix: false,
     contentType: "text/html",
   });
