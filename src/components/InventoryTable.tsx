@@ -405,7 +405,7 @@ export default function InventoryTable() {
 
       {/* Spreadsheet table */}
       <div className="rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: "#CBD5E1", backgroundColor: "white" }}>
-        <div className="overflow-x-auto" style={{ maxHeight: "calc(100vh - 340px)" }}>
+        <div className="overflow-x-auto" style={{ maxHeight: "calc(100vh - 220px)" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "1800px" }}>
             <thead>
               <tr>
