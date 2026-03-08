@@ -231,7 +231,7 @@ function BlinkButton({ product, onPurchase, openWalletModal }: { product: Produc
   const bgColors = {
     idle: product.price === 0 ? COLORS.teal : COLORS.purple,
     connecting: "#6B21A8",
-    signing: "#7C3AED",
+    signing: "#0A1628",
     confirming: "#0D9488",
     success: COLORS.teal,
     error: "#DC2626",
@@ -292,7 +292,7 @@ function StripeCheckoutButton({ tierName, price }: { tierName: string; price: nu
       <button
         onClick={() => setShowEmail(true)}
         className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm cursor-pointer transition-all hover:opacity-90"
-        style={{ backgroundColor: "#635BFF", color: "#FFFFFF" }}
+        style={{ backgroundColor: "#0A1628", color: "#FFFFFF" }}
       >
         Pay with Card — ${price.toFixed(2)}/mo
       </button>
@@ -307,13 +307,13 @@ function StripeCheckoutButton({ tierName, price }: { tierName: string; price: nu
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-        style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: "1px solid #CBD5E1" }}
+        style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, border: "1px solid #E5E7EB" }}
       />
       <button
         onClick={handleStripeCheckout}
         disabled={loading}
         className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm text-white cursor-pointer disabled:opacity-50"
-        style={{ backgroundColor: "#635BFF" }}
+        style={{ backgroundColor: "#0A1628" }}
       >
         {loading ? "Redirecting to Stripe..." : `Checkout — $${price.toFixed(2)}/mo`}
       </button>
@@ -331,11 +331,11 @@ function StripeCheckoutButton({ tierName, price }: { tierName: string; price: nu
 
 function ProductCard({ product, onPurchase, openWalletModal }: { product: Product; onPurchase: (p: Product, sig?: string) => void; openWalletModal: () => void }) {
   return (
-    <div className="rounded-xl p-5 border transition-all hover:border-purple-500" style={{ backgroundColor: COLORS.cardBg, borderColor: "#CBD5E1" }}>
+    <div className="p-5" style={{ backgroundColor: COLORS.cardBg, border: "1px solid #E5E7EB", borderRadius: "4px" }}>
       <div className="flex justify-between items-start mb-2">
-        <h3 className="text-slate-900 font-bold text-base">{product.name}</h3>
-        <span className="text-xs px-2 py-1 rounded-full font-medium shrink-0 ml-2" style={{ backgroundColor: product.type === "free" ? "#D1FAE5" : "#EDE9FE", color: product.type === "free" ? "#047857" : "#7C3AED" }}>
-          {product.type === "free" ? "FREE" : product.type === "one-time" ? "ONE-TIME" : "MONTHLY"}
+        <h3 className="font-semibold text-base" style={{ color: "#0A1628" }}>{product.name}</h3>
+        <span className="text-xs px-2 py-1 font-medium shrink-0 ml-2" style={{ backgroundColor: "#F5F5F5", color: "#6B7F99", borderRadius: "4px" }}>
+          {product.type === "free" ? "Free" : product.type === "one-time" ? "One-time" : "Monthly"}
         </span>
       </div>
       <p className="text-sm mb-1" style={{ color: COLORS.lightText }}>{product.description}</p>
@@ -348,9 +348,9 @@ function ProductCard({ product, onPurchase, openWalletModal }: { product: Produc
         <div className="space-y-2">
           <StripeCheckoutButton tierName={product.name} price={product.price} />
           <div className="flex items-center gap-2">
-            <div className="flex-1 h-px" style={{ backgroundColor: "#CBD5E1" }} />
+            <div className="flex-1 h-px" style={{ backgroundColor: "#E5E7EB" }} />
             <span className="text-xs" style={{ color: COLORS.midGray }}>or</span>
-            <div className="flex-1 h-px" style={{ backgroundColor: "#CBD5E1" }} />
+            <div className="flex-1 h-px" style={{ backgroundColor: "#E5E7EB" }} />
           </div>
           <BlinkButton product={product} onPurchase={onPurchase} openWalletModal={openWalletModal} />
         </div>
@@ -363,16 +363,16 @@ function ProductCard({ product, onPurchase, openWalletModal }: { product: Produc
 
 function TierCard({ tier, featured, openWalletModal, onSubscribed, isSubscribed }: { tier: Tier; featured: boolean; openWalletModal: () => void; onSubscribed: (tierName: TierName, sig: string) => void; isSubscribed: boolean }) {
   return (
-    <div className="rounded-xl p-5 border relative" style={{ backgroundColor: featured ? "#EFF6FF" : COLORS.cardBg, borderColor: featured ? COLORS.purple : "#CBD5E1" }}>
+    <div className="p-5 relative" style={{ backgroundColor: COLORS.cardBg, border: featured ? "2px solid #0A1628" : "1px solid #E5E7EB", borderRadius: "4px" }}>
       {featured && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: COLORS.purple, color: "white" }}>MOST POPULAR</div>
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-semibold px-3 py-1" style={{ backgroundColor: "#0A1628", color: "white", borderRadius: "4px" }}>Most Popular</div>
       )}
       {isSubscribed && (
-        <div className="absolute -top-3 right-4 text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: "#D1FAE5", color: COLORS.teal }}>SUBSCRIBED</div>
+        <div className="absolute -top-3 right-4 text-xs font-semibold px-3 py-1" style={{ backgroundColor: "#D1FAE5", color: COLORS.teal, borderRadius: "4px" }}>Subscribed</div>
       )}
-      <h3 className="text-slate-900 font-bold text-lg mb-1">{tier.name}</h3>
+      <h3 className="font-semibold text-lg mb-1" style={{ color: "#0A1628" }}>{tier.name}</h3>
       <div className="flex items-baseline gap-1 mb-1">
-        <span className="text-3xl font-black" style={{ color: COLORS.teal }}>${tier.price}</span>
+        <span className="text-3xl font-bold" style={{ color: COLORS.teal }}>${tier.price}</span>
         <span className="text-sm" style={{ color: COLORS.midGray }}>/month</span>
       </div>
       <p className="text-xs mb-4" style={{ color: COLORS.midGray }}>{tier.priceSol} SOL/month</p>
@@ -392,9 +392,9 @@ function TierCard({ tier, featured, openWalletModal, onSubscribed, isSubscribed 
         <div className="space-y-2">
           <StripeCheckoutButton tierName={tier.name} price={tier.price} />
           <div className="flex items-center gap-2">
-            <div className="flex-1 h-px" style={{ backgroundColor: "#CBD5E1" }} />
+            <div className="flex-1 h-px" style={{ backgroundColor: "#E5E7EB" }} />
             <span className="text-xs" style={{ color: COLORS.midGray }}>or</span>
-            <div className="flex-1 h-px" style={{ backgroundColor: "#CBD5E1" }} />
+            <div className="flex-1 h-px" style={{ backgroundColor: "#E5E7EB" }} />
           </div>
           <BlinkButton
             product={{ name: tier.name, price: tier.price, priceSol: tier.priceSol, type: "monthly" }}
@@ -413,7 +413,7 @@ function MiniBar({ label, value, max, color }: { label: string; value: number; m
   return (
     <div className="flex items-center gap-2">
       <span className="text-xs w-20 truncate" style={{ color: COLORS.lightText }}>{label}</span>
-      <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ backgroundColor: "#E8F0FE" }}>
+      <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ backgroundColor: "#F5F5F5" }}>
         <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
       <span className="text-xs font-bold w-12 text-right" style={{ color }}>{typeof value === "number" && value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value}</span>
@@ -523,11 +523,11 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
               {balance !== null && <p className="text-xs mt-1" style={{ color: COLORS.lightText }}>Balance: {balance.toFixed(4)} SOL</p>}
             </div>
             <div className="flex flex-wrap gap-2">
-              <button onClick={fetchBalance} className="px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer" style={{ backgroundColor: "#E0F2FE", color: COLORS.teal, border: "1px solid #CBD5E1" }}>Refresh Balance</button>
+              <button onClick={fetchBalance} className="px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer" style={{ backgroundColor: "#F5F5F5", color: COLORS.teal, border: "1px solid #E5E7EB" }}>Refresh Balance</button>
               <button onClick={requestAirdrop} disabled={airdropStatus === "loading"} className="px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer disabled:opacity-50" style={{ backgroundColor: COLORS.purple, color: "white" }}>
                 {airdropStatus === "loading" ? "Airdropping..." : airdropStatus === "success" ? "1 SOL Added!" : airdropStatus === "error" ? "Rate Limited" : "Airdrop 1 SOL"}
               </button>
-              <a href={`https://faucet.solana.com/?address=${publicKey.toBase58()}&cluster=devnet`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer inline-flex items-center" style={{ backgroundColor: "#E0F2FE", color: COLORS.lightText, border: "1px solid #CBD5E1" }}>Web Faucet ↗</a>
+              <a href={`https://faucet.solana.com/?address=${publicKey.toBase58()}&cluster=devnet`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer inline-flex items-center" style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, border: "1px solid #E5E7EB" }}>Web Faucet ↗</a>
             </div>
           </div>
         </div>
@@ -612,12 +612,12 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
               <MiniBar key={tier} label={tier} value={count} max={totalSubs} color={tier === "Explorer" ? COLORS.teal : tier === "Angler Pro" ? COLORS.purple : "#F59E0B"} />
             ))}
           </div>
-          <div className="mt-4 pt-3 border-t grid grid-cols-2 gap-3" style={{ borderColor: "#CBD5E1" }}>
-            <div className="rounded-lg p-3 text-center" style={{ backgroundColor: "#E8F0FE" }}>
+          <div className="mt-4 pt-3 border-t grid grid-cols-2 gap-3" style={{ borderColor: "#E5E7EB" }}>
+            <div className="rounded-lg p-3 text-center" style={{ backgroundColor: "#F5F5F5" }}>
               <div className="text-lg font-black" style={{ color: COLORS.teal }}>{conversionRate}%</div>
               <div className="text-xs" style={{ color: COLORS.midGray }}>Conversion Rate</div>
             </div>
-            <div className="rounded-lg p-3 text-center" style={{ backgroundColor: "#E8F0FE" }}>
+            <div className="rounded-lg p-3 text-center" style={{ backgroundColor: "#F5F5F5" }}>
               <div className="text-lg font-black" style={{ color: churnRate > 5 ? "#DC2626" : COLORS.teal }}>{churnRate}%</div>
               <div className="text-xs" style={{ color: COLORS.midGray }}>Monthly Churn</div>
             </div>
@@ -634,12 +634,12 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
               <span key={d} className="text-xs" style={{ color: i === 6 ? COLORS.purple : COLORS.midGray }}>{d}</span>
             ))}
           </div>
-          <div className="mt-4 pt-3 border-t grid grid-cols-2 gap-3" style={{ borderColor: "#CBD5E1" }}>
-            <div className="rounded-lg p-3 text-center" style={{ backgroundColor: "#E8F0FE" }}>
+          <div className="mt-4 pt-3 border-t grid grid-cols-2 gap-3" style={{ borderColor: "#E5E7EB" }}>
+            <div className="rounded-lg p-3 text-center" style={{ backgroundColor: "#F5F5F5" }}>
               <div className="text-lg font-black" style={{ color: COLORS.purple }}>${lifetimeValue}</div>
               <div className="text-xs" style={{ color: COLORS.midGray }}>Avg Lifetime Value</div>
             </div>
-            <div className="rounded-lg p-3 text-center" style={{ backgroundColor: "#E8F0FE" }}>
+            <div className="rounded-lg p-3 text-center" style={{ backgroundColor: "#F5F5F5" }}>
               <div className="text-lg font-black" style={{ color: COLORS.teal }}>${avgOrderValue}</div>
               <div className="text-xs" style={{ color: COLORS.midGray }}>Avg Order Value</div>
             </div>
@@ -654,12 +654,12 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
           <h3 className="text-slate-900 font-bold mb-1">Payment Methods</h3>
           <p className="text-xs mb-4" style={{ color: COLORS.midGray }}>Card vs Solana split</p>
           <div className="flex h-6 rounded-full overflow-hidden mb-3">
-            <div style={{ width: `${paymentSplit.card}%`, backgroundColor: "#635BFF" }} />
+            <div style={{ width: `${paymentSplit.card}%`, backgroundColor: "#0A1628" }} />
             <div style={{ width: `${paymentSplit.sol}%`, backgroundColor: COLORS.teal }} />
           </div>
           <div className="flex justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#635BFF" }} />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#0A1628" }} />
               <span className="text-xs" style={{ color: COLORS.lightText }}>Card {paymentSplit.card}%</span>
             </div>
             <div className="flex items-center gap-2">
@@ -667,7 +667,7 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
               <span className="text-xs" style={{ color: COLORS.lightText }}>SOL {paymentSplit.sol}%</span>
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t" style={{ borderColor: "#CBD5E1" }}>
+          <div className="mt-4 pt-3 border-t" style={{ borderColor: "#E5E7EB" }}>
             <div className="text-xs" style={{ color: COLORS.midGray }}>MRR (Monthly Recurring)</div>
             <div className="text-xl font-black" style={{ color: COLORS.teal }}>${(revenueBySource.memberships * 0.92).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           </div>
@@ -687,7 +687,7 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
             ))}
           </div>
           {orderStats && orderStats.revenue > 0 && (
-            <div className="mt-3 pt-3 border-t" style={{ borderColor: "#CBD5E1" }}>
+            <div className="mt-3 pt-3 border-t" style={{ borderColor: "#E5E7EB" }}>
               <div className="text-xs" style={{ color: COLORS.midGray }}>Actual Merch Revenue</div>
               <div className="text-lg font-black" style={{ color: "#F59E0B" }}>${orderStats.revenue.toFixed(2)}</div>
             </div>
@@ -707,7 +707,7 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
               </div>
             ))}
           </div>
-          <div className="mt-3 pt-3 border-t" style={{ borderColor: "#CBD5E1" }}>
+          <div className="mt-3 pt-3 border-t" style={{ borderColor: "#E5E7EB" }}>
             <div className="text-xs" style={{ color: COLORS.midGray }}>Avg Likes / Post</div>
             <div className="text-lg font-black" style={{ color: "#DC2626" }}>{Math.round(INITIAL_POSTS.reduce((s, p) => s + p.likes, 0) / INITIAL_POSTS.length)}</div>
           </div>
@@ -721,7 +721,7 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
       <div className="rounded-xl p-5" style={{ backgroundColor: COLORS.cardBg }}>
         <h3 className="text-slate-900 font-bold mb-3">Blink Generator</h3>
         <div className="flex flex-col sm:flex-row gap-3">
-          <select className="flex-1 rounded-lg px-3 py-2 text-sm" style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: "1px solid #CBD5E1" }}>
+          <select className="flex-1 rounded-lg px-3 py-2 text-sm" style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, border: "1px solid #E5E7EB" }}>
             <option>Complete Tackle Bundle — 0.36 SOL</option>
             <option>Monthly Bait Box — 0.18 SOL/mo</option>
             <option>Angler Pro Tier — 0.15 SOL/mo</option>
@@ -729,7 +729,7 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
           <button onClick={generateBlink} className="px-5 py-2 rounded-lg font-semibold text-sm text-white cursor-pointer" style={{ backgroundColor: COLORS.purple }}>Generate Blink</button>
         </div>
         {blinkUrl && (
-          <div className="mt-3 flex items-center gap-2 rounded-lg px-3 py-2" style={{ backgroundColor: "#E8F0FE", border: "1px solid #CBD5E1" }}>
+          <div className="mt-3 flex items-center gap-2 rounded-lg px-3 py-2" style={{ backgroundColor: "#F5F5F5", border: "1px solid #E5E7EB" }}>
             <span className="text-sm flex-1 font-mono" style={{ color: COLORS.teal }}>{blinkUrl}</span>
             <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: "#D1FAE5", color: COLORS.teal }}>Copied!</span>
           </div>
@@ -748,9 +748,9 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
             { wallet: "5dTx...2jMr", product: "Swimbait Pack", amount: "+$29.99", time: "2 hrs ago", method: "card" },
             { wallet: "8kLm...4nVw", product: "Tackle Bundle", amount: "+0.36 SOL", time: "3 hrs ago", method: "sol" },
           ].map((tx, i) => (
-            <div key={i} className="flex items-center justify-between py-2 border-b" style={{ borderColor: "#CBD5E1" }}>
+            <div key={i} className="flex items-center justify-between py-2 border-b" style={{ borderColor: "#E5E7EB" }}>
               <div className="flex items-center gap-2">
-                <span className="text-xs px-1.5 py-0.5 rounded font-mono" style={{ backgroundColor: tx.method === "sol" ? "#D1FAE5" : "#EFF6FF", color: tx.method === "sol" ? COLORS.teal : "#635BFF", fontSize: "10px" }}>
+                <span className="text-xs px-1.5 py-0.5 rounded font-mono" style={{ backgroundColor: tx.method === "sol" ? "#D1FAE5" : "#F5F5F5", color: tx.method === "sol" ? COLORS.teal : "#635BFF", fontSize: "10px" }}>
                   {tx.method === "sol" ? "SOL" : "CARD"}
                 </span>
                 <span className="text-sm font-mono text-slate-900">{tx.wallet}</span>
@@ -768,25 +768,26 @@ function CreatorDashboard({ onPostCreated }: { onPostCreated: (post: Post) => vo
   );
 }
 
-// --- Merch Card (simple, click to open detail) ---
+// --- Merch Card (minimal: image + name + price) ---
 function MerchCard({ item, onClick }: { item: MerchItem; onClick: () => void }) {
   return (
     <div
       onClick={onClick}
-      className="rounded-xl overflow-hidden border transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer"
-      style={{ backgroundColor: COLORS.cardBg, borderColor: "#CBD5E1" }}
+      className="cursor-pointer transition-all"
+      style={{ opacity: 1 }}
+      onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+      onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
     >
       {item.imageUrl ? (
-        <div className="overflow-hidden rounded-t-xl" style={{ width: "100%", height: "16rem", backgroundColor: "#E8F0FE" }}>
+        <div className="overflow-hidden" style={{ width: "100%", height: "16rem", backgroundColor: "#F5F5F5" }}>
           <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </div>
       ) : (
-        <div className="text-center rounded-t-xl" style={{ fontSize: "8rem", padding: "4rem 0", backgroundColor: "#E8F0FE" }}>{item.emoji}</div>
+        <div className="text-center" style={{ fontSize: "8rem", padding: "4rem 0", backgroundColor: "#F5F5F5" }}>{item.emoji}</div>
       )}
-      <div className="p-5">
-        <h3 className="text-slate-900 font-bold text-base leading-tight mb-1">{item.name}</h3>
-        <p className="text-sm mb-2" style={{ color: COLORS.lightText }}>{item.description}</p>
-        <span className="text-xl font-black" style={{ color: COLORS.teal }}>${item.price.toFixed(2)}</span>
+      <div style={{ padding: "12px 4px" }}>
+        <h3 className="font-medium text-sm leading-tight mb-1" style={{ color: "#0A1628" }}>{item.name}</h3>
+        <span className="text-sm font-semibold" style={{ color: COLORS.teal }}>${item.price.toFixed(2)}</span>
       </div>
     </div>
   );
@@ -812,7 +813,7 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.4)" }} onClick={onClose}>
       <div className="rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "white", width: "100%", maxWidth: "36rem" }} onClick={(e) => e.stopPropagation()}>
         {/* Image area with thumbnails */}
-        <div className="flex" style={{ backgroundColor: "#E8F0FE" }}>
+        <div className="flex" style={{ backgroundColor: "#F5F5F5" }}>
           {/* Thumbnail column — top left */}
           {(frontImage || backImage) && (
             <div className="flex flex-col gap-2 p-3" style={{ minWidth: "72px" }}>
@@ -878,7 +879,7 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
                     onClick={() => setGender(g)}
                     className="flex-1 py-2 rounded-lg text-sm font-semibold capitalize cursor-pointer transition-all"
                     style={{
-                      backgroundColor: gender === g ? COLORS.teal : "#E8F0FE",
+                      backgroundColor: gender === g ? COLORS.teal : "#F5F5F5",
                       color: gender === g ? "white" : COLORS.lightText,
                       border: `1px solid ${gender === g ? COLORS.teal : "#CBD5E1"}`,
                     }}
@@ -901,7 +902,7 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
                     onClick={() => setSelectedSize(s)}
                     className="px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer transition-all"
                     style={{
-                      backgroundColor: selectedSize === s ? COLORS.teal : "#E8F0FE",
+                      backgroundColor: selectedSize === s ? COLORS.teal : "#F5F5F5",
                       color: selectedSize === s ? "white" : COLORS.lightText,
                       border: `1px solid ${selectedSize === s ? COLORS.teal : "#CBD5E1"}`,
                     }}
@@ -924,7 +925,7 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
                     onClick={() => setSelectedColor(c)}
                     className="px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer transition-all capitalize"
                     style={{
-                      backgroundColor: selectedColor === c ? COLORS.teal : "#E8F0FE",
+                      backgroundColor: selectedColor === c ? COLORS.teal : "#F5F5F5",
                       color: selectedColor === c ? "white" : COLORS.lightText,
                       border: `1px solid ${selectedColor === c ? COLORS.teal : "#CBD5E1"}`,
                     }}
@@ -943,13 +944,13 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold cursor-pointer"
-                style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: "1px solid #CBD5E1" }}
+                style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, border: "1px solid #E5E7EB" }}
               >-</button>
               <span className="text-lg font-bold text-slate-900 w-8 text-center">{quantity}</span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
                 className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold cursor-pointer"
-                style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: "1px solid #CBD5E1" }}
+                style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, border: "1px solid #E5E7EB" }}
               >+</button>
             </div>
           </div>
@@ -958,17 +959,17 @@ function MerchDetailModal({ item, onClose, onAddToCart }: {
           <div className="flex gap-3">
             <button
               onClick={() => { onAddToCart(item, selectedSize || undefined, gender, quantity, selectedColor || undefined, false); onClose(); }}
-              className="flex-1 py-3 rounded-lg font-bold cursor-pointer transition-all hover:opacity-90 text-sm"
-              style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: `1px solid #CBD5E1` }}
+              className="flex-1 py-3 font-semibold cursor-pointer transition-all hover:opacity-90 text-sm"
+              style={{ backgroundColor: "transparent", color: "#0A1628", border: "1px solid #0A1628", borderRadius: "4px" }}
             >
-              Add to Cart & Continue Shopping
+              Continue Shopping
             </button>
             <button
               onClick={() => { onAddToCart(item, selectedSize || undefined, gender, quantity, selectedColor || undefined, true); onClose(); }}
-              className="flex-1 py-3 rounded-lg font-bold text-white cursor-pointer transition-all hover:opacity-90 text-sm"
-              style={{ backgroundColor: COLORS.purple }}
+              className="flex-1 py-3 font-semibold text-white cursor-pointer transition-all hover:opacity-90 text-sm"
+              style={{ backgroundColor: COLORS.teal, borderRadius: "4px" }}
             >
-              Add to Cart & Checkout — ${(item.price * quantity).toFixed(2)}
+              Checkout — ${(item.price * quantity).toFixed(2)}
             </button>
           </div>
         </div>
@@ -1001,47 +1002,47 @@ function RotatingHeroBanner({ merch, onShopNow }: { merch: MerchItem[]; onShopNo
           opacity: slide === 0 ? 1 : 0,
           transform: slide === 0 ? "translateX(0)" : "translateX(-100%)",
           pointerEvents: slide === 0 ? "auto" : "none",
-          backgroundImage: "linear-gradient(135deg, rgba(8,145,212,0.7) 0%, rgba(10,22,40,0.65) 50%, rgba(224,138,0,0.6) 100%), url('/beach-bg.jpg')",
+          backgroundImage: "linear-gradient(135deg, rgba(10,22,40,0.75) 0%, rgba(10,22,40,0.55) 100%), url('/beach-bg.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
         <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center gap-8 w-full">
           <div className="flex-1 text-center md:text-left">
-            <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: "rgba(255,255,255,0.7)" }}>Limited Time Offer</p>
-            <h2 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-wider mb-4" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.3)" }}>
+            <p className="text-sm font-medium uppercase tracking-widest mb-2" style={{ color: "rgba(255,255,255,0.7)" }}>Limited Time Offer</p>
+            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.3)" }}>
               Spend & Save
             </h2>
-            <p className="text-base text-white/80 mb-6 max-w-md">The more you spend, the more you save. Stock up on your favorite gear!</p>
+            <p className="text-base mb-6 max-w-md" style={{ color: "rgba(255,255,255,0.8)" }}>The more you spend, the more you save. Stock up on your favorite gear!</p>
             <button
               onClick={onShopNow}
-              className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105"
-              style={{ backgroundColor: "white", color: "#0A1628" }}
+              className="px-8 py-3 font-semibold text-sm cursor-pointer transition-all hover:opacity-90"
+              style={{ backgroundColor: "white", color: "#0A1628", borderRadius: "4px" }}
             >
               Shop Now
             </button>
           </div>
           <div className="flex-1 flex flex-col gap-3 max-w-sm w-full">
             {/* Tier cards */}
-            <div className="rounded-xl p-4 flex items-center gap-4" style={{ backgroundColor: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.2)" }}>
-              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black shrink-0" style={{ backgroundColor: "#E08A00", color: "white" }}>15%</div>
+            <div className="p-4 flex items-center gap-4" style={{ backgroundColor: "rgba(255,255,255,0.95)", borderRadius: "4px", border: "1px solid #E5E7EB" }}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold shrink-0" style={{ backgroundColor: "#0A1628", color: "white" }}>15%</div>
               <div>
-                <p className="text-white font-bold text-lg">15% Off</p>
-                <p className="text-white/70 text-sm">Orders of $75.00 or more</p>
+                <p className="font-semibold text-base" style={{ color: "#0A1628" }}>15% Off</p>
+                <p className="text-sm" style={{ color: "#6B7F99" }}>Orders of $75.00 or more</p>
               </div>
             </div>
-            <div className="rounded-xl p-4 flex items-center gap-4" style={{ backgroundColor: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.25)" }}>
-              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black shrink-0" style={{ backgroundColor: "#D97706", color: "white" }}>20%</div>
+            <div className="p-4 flex items-center gap-4" style={{ backgroundColor: "rgba(255,255,255,0.95)", borderRadius: "4px", border: "1px solid #E5E7EB" }}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold shrink-0" style={{ backgroundColor: "#0A1628", color: "white" }}>20%</div>
               <div>
-                <p className="text-white font-bold text-lg">20% Off</p>
-                <p className="text-white/70 text-sm">Orders of $125.00 or more</p>
+                <p className="font-semibold text-base" style={{ color: "#0A1628" }}>20% Off</p>
+                <p className="text-sm" style={{ color: "#6B7F99" }}>Orders of $125.00 or more</p>
               </div>
             </div>
-            <div className="rounded-xl p-4 flex items-center gap-4" style={{ backgroundColor: "rgba(255,255,255,0.24)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black shrink-0" style={{ backgroundColor: "#B45309", color: "white" }}>25%</div>
+            <div className="p-4 flex items-center gap-4" style={{ backgroundColor: "rgba(255,255,255,0.95)", borderRadius: "4px", border: "1px solid #E5E7EB" }}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold shrink-0" style={{ backgroundColor: "#0891D4", color: "white" }}>25%</div>
               <div>
-                <p className="text-white font-bold text-lg">25% Off</p>
-                <p className="text-white/70 text-sm">Orders over $200.00</p>
+                <p className="font-semibold text-base" style={{ color: "#0A1628" }}>25% Off</p>
+                <p className="text-sm" style={{ color: "#6B7F99" }}>Orders over $200.00</p>
               </div>
             </div>
           </div>
@@ -1055,7 +1056,7 @@ function RotatingHeroBanner({ merch, onShopNow }: { merch: MerchItem[]; onShopNo
           opacity: slide === 1 ? 1 : 0,
           transform: slide === 1 ? "translateX(0)" : "translateX(100%)",
           pointerEvents: slide === 1 ? "auto" : "none",
-          backgroundImage: "linear-gradient(135deg, rgba(240,247,255,0.85) 0%, rgba(224,242,254,0.8) 50%, rgba(186,230,253,0.75) 100%), url('/beach-bg.jpg')",
+          backgroundImage: "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(245,245,245,0.88) 100%), url('/beach-bg.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -1064,18 +1065,18 @@ function RotatingHeroBanner({ merch, onShopNow }: { merch: MerchItem[]; onShopNo
           <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10 w-full">
             {/* Product image */}
             <div className="flex-1 flex justify-center">
-              <div className="w-72 h-72 rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: "white" }}>
+              <div className="overflow-hidden" style={{ width: "288px", height: "288px", borderRadius: "4px", backgroundColor: "#F5F5F5" }}>
                 {newestItem.imageUrl ? (
-                  <img src={newestItem.imageUrl} alt={newestItem.name} className="w-full h-full object-cover" />
+                  <img src={newestItem.imageUrl} alt={newestItem.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-9xl" style={{ backgroundColor: "#E8F0FE" }}>{newestItem.emoji}</div>
+                  <div className="w-full h-full flex items-center justify-center" style={{ fontSize: "8rem", backgroundColor: "#F5F5F5" }}>{newestItem.emoji}</div>
                 )}
               </div>
             </div>
             {/* Product info */}
             <div className="flex-1 text-center md:text-left">
-              <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: COLORS.teal }}>Just Added</p>
-              <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-wider mb-3" style={{ color: "#0A1628" }}>
+              <p className="text-sm font-medium uppercase tracking-widest mb-2" style={{ color: COLORS.teal }}>Just Added</p>
+              <h2 className="text-3xl sm:text-4xl font-semibold mb-3" style={{ color: "#0A1628" }}>
                 {newestItem.name}
               </h2>
               <p className="text-base mb-4 max-w-md" style={{ color: COLORS.lightText }}>
@@ -1092,15 +1093,15 @@ function RotatingHeroBanner({ merch, onShopNow }: { merch: MerchItem[]; onShopNo
                 </p>
               )}
               <div className="flex items-baseline gap-3 mb-5 justify-center md:justify-start">
-                <span className="text-3xl font-black" style={{ color: COLORS.teal }}>${newestItem.price.toFixed(2)}</span>
+                <span className="text-3xl font-bold" style={{ color: COLORS.teal }}>${newestItem.price.toFixed(2)}</span>
                 {newestItem.priceSol > 0 && (
                   <span className="text-sm" style={{ color: COLORS.midGray }}>{newestItem.priceSol} SOL</span>
                 )}
               </div>
               <button
                 onClick={onShopNow}
-                className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105"
-                style={{ backgroundColor: COLORS.teal, color: "white" }}
+                className="px-8 py-3 font-semibold text-sm cursor-pointer transition-all hover:opacity-90"
+                style={{ backgroundColor: "#0A1628", color: "white", borderRadius: "4px" }}
               >
                 Shop Now
               </button>
@@ -1197,7 +1198,7 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.7)" }} onClick={onClose}>
-      <div className="w-full max-w-lg rounded-2xl p-6 max-h-[85vh] overflow-y-auto" style={{ backgroundColor: COLORS.cardBg, border: "1px solid #CBD5E1" }} onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-lg rounded-2xl p-6 max-h-[85vh] overflow-y-auto" style={{ backgroundColor: COLORS.cardBg, border: "1px solid #E5E7EB" }} onClick={(e) => e.stopPropagation()}>
         {step === "cart" && (
           <>
             <div className="flex justify-between items-center mb-4">
@@ -1210,7 +1211,7 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
               <>
                 <div className="space-y-3 mb-4">
                   {cart.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: "#E8F0FE" }}>
+                    <div key={idx} className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: "#F5F5F5" }}>
                       <span className="text-2xl">{item.merch.emoji}</span>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-slate-900">{item.merch.name}</p>
@@ -1222,21 +1223,21 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
                         <p className="text-sm font-bold" style={{ color: COLORS.teal }}>${(item.merch.price * item.quantity).toFixed(2)}</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button onClick={() => onUpdateQty(idx, Math.max(1, item.quantity - 1))} className="w-7 h-7 rounded flex items-center justify-center cursor-pointer text-slate-900 text-sm" style={{ backgroundColor: "#CBD5E1" }}>-</button>
+                        <button onClick={() => onUpdateQty(idx, Math.max(1, item.quantity - 1))} className="w-7 h-7 rounded flex items-center justify-center cursor-pointer text-slate-900 text-sm" style={{ backgroundColor: "#E5E7EB" }}>-</button>
                         <span className="text-slate-900 text-sm w-4 text-center">{item.quantity}</span>
-                        <button onClick={() => onUpdateQty(idx, item.quantity + 1)} className="w-7 h-7 rounded flex items-center justify-center cursor-pointer text-slate-900 text-sm" style={{ backgroundColor: "#CBD5E1" }}>+</button>
+                        <button onClick={() => onUpdateQty(idx, item.quantity + 1)} className="w-7 h-7 rounded flex items-center justify-center cursor-pointer text-slate-900 text-sm" style={{ backgroundColor: "#E5E7EB" }}>+</button>
                       </div>
                       <button onClick={() => onRemove(idx)} className="text-red-400 text-xs cursor-pointer hover:text-red-300">Remove</button>
                     </div>
                   ))}
                 </div>
-                <div className="border-t pt-3 space-y-1" style={{ borderColor: "#CBD5E1" }}>
+                <div className="border-t pt-3 space-y-1" style={{ borderColor: "#E5E7EB" }}>
                   <div className="flex justify-between text-sm" style={{ color: COLORS.lightText }}><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
                   <div className="flex justify-between text-sm" style={{ color: COLORS.lightText }}><span>Shipping {actualShipping === null ? "(est.)" : ""}</span><span>{shippingCost === 0 ? <span style={{ color: COLORS.teal }}>FREE</span> : `$${shippingCost.toFixed(2)}`}</span></div>
                   {subtotal < 50 && <p className="text-xs" style={{ color: COLORS.midGray }}>Free shipping on orders over $50!</p>}
-                  <div className="flex justify-between text-lg font-black pt-2" style={{ color: "white" }}><span>Total</span><span style={{ color: COLORS.teal }}>${(subtotal + shippingCost).toFixed(2)}</span></div>
+                  <div className="flex justify-between text-lg font-bold pt-2" style={{ color: "#0A1628" }}><span>Total</span><span style={{ color: COLORS.teal }}>${(subtotal + shippingCost).toFixed(2)}</span></div>
                 </div>
-                <button onClick={() => setStep("shipping")} className="w-full mt-4 py-3 rounded-lg font-bold text-white cursor-pointer" style={{ backgroundColor: COLORS.purple }}>Proceed to Shipping</button>
+                <button onClick={() => setStep("shipping")} className="w-full mt-4 py-3 font-semibold text-white cursor-pointer" style={{ backgroundColor: "#0A1628", borderRadius: "4px" }}>Proceed to Shipping</button>
               </>
             )}
           </>
@@ -1262,7 +1263,7 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
                     value={shipping[field.key as keyof typeof shipping]}
                     onChange={(e) => setShipping({ ...shipping, [field.key]: e.target.value })}
                     className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                    style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: "1px solid #CBD5E1" }}
+                    style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, border: "1px solid #E5E7EB" }}
                   />
                 </div>
               ))}
@@ -1270,22 +1271,22 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
                 <div>
                   <label className="text-xs font-medium mb-1 block" style={{ color: COLORS.lightText }}>State</label>
                   <input placeholder="TX" value={shipping.state} onChange={(e) => setShipping({ ...shipping, state: e.target.value })}
-                    className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: "1px solid #CBD5E1" }} />
+                    className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, border: "1px solid #E5E7EB" }} />
                 </div>
                 <div>
                   <label className="text-xs font-medium mb-1 block" style={{ color: COLORS.lightText }}>ZIP Code</label>
                   <input placeholder="78701" value={shipping.zip} onChange={(e) => setShipping({ ...shipping, zip: e.target.value })}
-                    className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: "1px solid #CBD5E1" }} />
+                    className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, border: "1px solid #E5E7EB" }} />
                 </div>
               </div>
             </div>
             {error && <p className="text-red-400 text-sm mt-3">{error}</p>}
-            <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: "#E8F0FE" }}>
+            <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: "#F5F5F5" }}>
               <div className="flex justify-between text-sm text-slate-900"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
               <div className="flex justify-between text-sm text-slate-900"><span>Shipping (weight-based)</span><span>{shippingCost === 0 ? <span style={{ color: COLORS.teal }}>FREE</span> : `$${shippingCost.toFixed(2)}`}</span></div>
-              <div className="flex justify-between text-sm font-bold text-slate-900 pt-1 border-t mt-1" style={{ borderColor: "#CBD5E1" }}><span>Order Total</span><span style={{ color: COLORS.teal }}>${(subtotal + shippingCost).toFixed(2)}</span></div>
+              <div className="flex justify-between text-sm font-bold text-slate-900 pt-1 border-t mt-1" style={{ borderColor: "#E5E7EB" }}><span>Order Total</span><span style={{ color: COLORS.teal }}>${(subtotal + shippingCost).toFixed(2)}</span></div>
             </div>
-            <button onClick={handleSubmit} disabled={submitting} className="w-full mt-4 py-3 rounded-lg font-bold text-white cursor-pointer disabled:opacity-50" style={{ backgroundColor: "#635BFF" }}>
+            <button onClick={handleSubmit} disabled={submitting} className="w-full mt-4 py-3 font-semibold text-white cursor-pointer disabled:opacity-50" style={{ backgroundColor: COLORS.teal, borderRadius: "4px" }}>
               {submitting ? "Placing Order..." : `Pay $${(subtotal + shippingCost).toFixed(2)} with Card`}
             </button>
           </>
@@ -1296,7 +1297,7 @@ function OrderModal({ cart, onClose, onRemove, onUpdateQty, onOrderComplete }: {
             <h2 className="text-xl font-black text-slate-900 mb-2">Order Confirmed!</h2>
             <p className="text-sm mb-1" style={{ color: COLORS.lightText }}>Order ID: <span className="font-mono" style={{ color: COLORS.teal }}>{orderResult.id}</span></p>
             <p className="text-sm mb-4" style={{ color: COLORS.midGray }}>A confirmation email will be sent to your address. Your shipping label is being generated.</p>
-            <button onClick={onClose} className="px-6 py-2.5 rounded-lg font-bold text-white cursor-pointer" style={{ backgroundColor: COLORS.purple }}>Continue Shopping</button>
+            <button onClick={onClose} className="px-6 py-2.5 font-semibold text-white cursor-pointer" style={{ backgroundColor: "#0A1628", borderRadius: "4px" }}>Continue Shopping</button>
           </div>
         )}
       </div>
@@ -1335,9 +1336,8 @@ function NewsletterSection() {
   };
 
   return (
-    <div className="rounded-xl p-6 text-center" style={{ background: "linear-gradient(135deg, #DBEAFE, #D1FAE5)", border: "1px solid #CBD5E1" }}>
-      <div className="text-3xl mb-2">📬</div>
-      <h3 className="font-bold text-lg mb-1" style={{ color: "#0A1628" }}>Stay in the Loop!</h3>
+    <div className="p-6 text-center" style={{ backgroundColor: "white", borderTop: "1px solid #E5E7EB", borderBottom: "1px solid #E5E7EB" }}>
+      <h3 className="font-semibold text-lg mb-1" style={{ color: "#0A1628" }}>Stay in the Loop</h3>
       <p className="text-sm mb-4" style={{ color: COLORS.lightText }}>Get fishing reports, charter updates, exclusive bait releases, and insider tips delivered to your inbox.</p>
       <div className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
         <input
@@ -1345,8 +1345,8 @@ function NewsletterSection() {
           placeholder="First name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="px-3 py-2.5 rounded-lg text-sm outline-none sm:w-32"
-          style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: "1px solid #CBD5E1" }}
+          className="px-3 py-2.5 text-sm outline-none sm:w-32"
+          style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, border: "1px solid #E5E7EB", borderRadius: "4px" }}
         />
         <input
           type="email"
@@ -1354,14 +1354,14 @@ function NewsletterSection() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSubscribe()}
-          className="flex-1 px-3 py-2.5 rounded-lg text-sm outline-none"
-          style={{ backgroundColor: "#E8F0FE", color: COLORS.lightText, border: "1px solid #CBD5E1" }}
+          className="flex-1 px-3 py-2.5 text-sm outline-none"
+          style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, border: "1px solid #E5E7EB", borderRadius: "4px" }}
         />
         <button
           onClick={handleSubscribe}
           disabled={status === "loading"}
-          className="px-5 py-2.5 rounded-lg font-bold text-sm cursor-pointer disabled:opacity-50 whitespace-nowrap"
-          style={{ backgroundColor: status === "success" ? COLORS.teal : status === "error" ? "#DC2626" : COLORS.purple, color: "white" }}
+          className="px-5 py-2.5 font-semibold text-sm cursor-pointer disabled:opacity-50 whitespace-nowrap"
+          style={{ backgroundColor: status === "success" ? COLORS.teal : status === "error" ? "#DC2626" : COLORS.teal, color: "white", borderRadius: "4px" }}
         >
           {status === "loading" ? "Subscribing..." : status === "success" ? "Subscribed!" : status === "already" ? "Already Subscribed" : status === "error" ? "Try Again" : "Subscribe"}
         </button>
@@ -1523,12 +1523,12 @@ function Always80AppInner() {
       backgroundColor: COLORS.darkBg,
     }}>
       {/* Top Bar — announcement */}
-      <div className="text-center py-2 text-xs font-medium tracking-wide" style={{ backgroundColor: COLORS.teal, color: "white" }}>
-        FREE SHIPPING ON ORDERS OVER $50 &nbsp;|&nbsp; SOLANA DEVNET — TEST MODE
+      <div className="text-center py-2 text-xs font-medium tracking-wide" style={{ backgroundColor: "#0A1628", color: "rgba(255,255,255,0.85)", letterSpacing: "0.05em" }}>
+        Free shipping on orders over $50 &nbsp;|&nbsp; Solana Devnet — Test Mode
       </div>
 
       {/* Nav — sticky */}
-      <nav className="border-b px-4 sm:px-6 py-2 flex items-center justify-between sticky top-0 z-40 shadow-sm" style={{ borderColor: "#CBD5E1", backgroundColor: "rgba(255, 255, 255, 0.97)", backdropFilter: "blur(12px)" }}>
+      <nav className="border-b px-4 sm:px-6 py-2 flex items-center justify-between sticky top-0 z-40 shadow-sm" style={{ borderColor: "#E5E7EB", backgroundColor: "rgba(255, 255, 255, 0.97)", backdropFilter: "blur(12px)" }}>
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView("storefront")}>
           <img src="/logo.png" alt="Always 80 and Sunny" className="rounded-lg" style={{ height: "40px", width: "auto" }} />
           <div className="hidden sm:flex flex-col">
@@ -1542,7 +1542,7 @@ function Always80AppInner() {
               key={v.key}
               onClick={() => setView(v.key as ViewKey)}
               className="px-4 py-2 text-sm font-semibold uppercase tracking-wider transition-colors cursor-pointer"
-              style={{ color: view === v.key ? "#0A1628" : "#6B7F99", borderBottom: view === v.key ? `2px solid ${COLORS.teal}` : "2px solid transparent" }}
+              style={{ color: view === v.key ? "#0A1628" : "#6B7F99", borderBottom: view === v.key ? "2px solid #0A1628" : "2px solid transparent" }}
             >
               {v.label}
             </button>
@@ -1576,13 +1576,13 @@ function Always80AppInner() {
         </div>
       </nav>
       {/* Mobile nav dropdown */}
-      <div id="mobile-nav" className="hidden md:hidden border-b shadow-sm" style={{ backgroundColor: "white", borderColor: "#CBD5E1" }}>
+      <div id="mobile-nav" className="hidden md:hidden border-b shadow-sm" style={{ backgroundColor: "white", borderColor: "#E5E7EB" }}>
         {views.map((v) => (
           <button
             key={v.key}
             onClick={() => { setView(v.key as ViewKey); document.getElementById("mobile-nav")?.classList.add("hidden"); }}
             className="block w-full text-left px-6 py-3 text-sm font-semibold uppercase tracking-wider cursor-pointer"
-            style={{ color: view === v.key ? "#0A1628" : COLORS.midGray, backgroundColor: view === v.key ? "#EFF6FF" : "transparent" }}
+            style={{ color: view === v.key ? "#0A1628" : COLORS.midGray, backgroundColor: view === v.key ? "#F5F5F5" : "transparent" }}
           >
             {v.label}
           </button>
@@ -1617,49 +1617,42 @@ function Always80AppInner() {
           {/* === ROTATING HERO BANNER === */}
           <RotatingHeroBanner merch={merch} onShopNow={() => { const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" }); }} />
 
-          {/* === SHOP BY CATEGORY (horizontal scroll) === */}
-          <div className="py-10 px-4 sm:px-6" style={{ backgroundColor: "#E0F2FE" }}>
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-center text-2xl font-black uppercase tracking-wider mb-6" style={{ color: "#0A1628" }}>Shop by Category</h2>
-              <div className="flex justify-center gap-4 pb-4">
-                {[
-                  { label: "Swimbaits", emoji: "🎣", filter: "tackle" },
-                  { label: "Apparel", emoji: "👕", filter: "apparel" },
-                  { label: "Jig Heads", emoji: "🪝", filter: "tackle" },
-                  { label: "Sun Shirts", emoji: "☀️", filter: "apparel" },
-                  { label: "Accessories", emoji: "🎒", filter: "accessory" },
-                  { label: "Charters", emoji: "🚤", filter: "charters" },
-                  { label: "Memberships", emoji: "⭐", filter: "memberships" },
-                ].map((cat, i) => (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      if (cat.filter === "charters") { setView("charters"); return; }
-                      if (cat.filter === "memberships") { const el = document.getElementById("tiers-section"); el?.scrollIntoView({ behavior: "smooth" }); return; }
-                      // Scroll to category-specific section, fall back to merch-section
-                      const sectionId = cat.filter === "apparel" ? "section-apparel"
-                        : cat.filter === "tackle" ? "section-tackle"
-                        : cat.filter === "accessory" ? "section-accessories"
-                        : "merch-section";
-                      const el = document.getElementById(sectionId) || document.getElementById("merch-section");
-                      el?.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    className="flex flex-col items-center gap-3 cursor-pointer group"
-                  >
-                    <div className="w-28 h-28 rounded-full flex items-center justify-center text-4xl transition-all group-hover:scale-110 shadow-md" style={{ backgroundColor: "white", border: "2px solid #CBD5E1" }}>
-                      {cat.emoji}
-                    </div>
-                    <span className="text-sm font-semibold uppercase tracking-wider group-hover:text-gray-900" style={{ color: "#334155" }}>{cat.label}</span>
-                  </button>
-                ))}
-              </div>
+          {/* === SHOP BY CATEGORY — clean text links === */}
+          <div className="py-6 px-4 sm:px-6" style={{ borderTop: "1px solid #E5E7EB", borderBottom: "1px solid #E5E7EB" }}>
+            <div className="max-w-6xl mx-auto flex items-center justify-center gap-6 flex-wrap">
+              {[
+                { label: "Apparel", filter: "apparel" },
+                { label: "Tackle", filter: "tackle" },
+                { label: "Accessories", filter: "accessory" },
+                { label: "Sun Shirts", filter: "apparel" },
+                { label: "Charters", filter: "charters" },
+              ].map((cat, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    if (cat.filter === "charters") { setView("charters"); return; }
+                    const sectionId = cat.filter === "apparel" ? "section-apparel"
+                      : cat.filter === "tackle" ? "section-tackle"
+                      : cat.filter === "accessory" ? "section-accessories"
+                      : "merch-section";
+                    const el = document.getElementById(sectionId) || document.getElementById("merch-section");
+                    el?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="text-sm font-medium cursor-pointer transition-all"
+                  style={{ color: "#0A1628", textDecoration: "none", borderBottom: "1px solid transparent", paddingBottom: "2px" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderBottomColor = "#0A1628")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderBottomColor = "transparent")}
+                >
+                  {cat.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* === NEW ARRIVALS — All Items Carousel === */}
+          {/* === New Arrivals — All Items === */}
           <div id="merch-section" className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>New Arrivals</h2>
+              <h2 className="text-xl font-semibold" style={{ color: "#0A1628" }}>New Arrivals</h2>
               <span className="text-sm" style={{ color: COLORS.midGray }}>{merch.length} items</span>
             </div>
             {merch.length > 0 ? (
@@ -1675,12 +1668,12 @@ function Always80AppInner() {
             )}
           </div>
 
-          {/* === APPAREL — Category Carousel === */}
+          {/* === Apparel === */}
           {merch.filter(m => m.category === "apparel").length > 0 && (
-            <div id="section-apparel" className="py-10 px-4 sm:px-6" style={{ backgroundColor: "#F0F7FF" }}>
+            <div id="section-apparel" className="py-10 px-4 sm:px-6" style={{ borderTop: "1px solid #E5E7EB" }}>
               <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Apparel</h2>
+                  <h2 className="text-xl font-semibold" style={{ color: "#0A1628" }}>Apparel</h2>
                   <span className="text-sm" style={{ color: COLORS.midGray }}>{merch.filter(m => m.category === "apparel").length} items</span>
                 </div>
                 <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
@@ -1701,22 +1694,22 @@ function Always80AppInner() {
             backgroundPosition: "center bottom",
           }}>
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
-              <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider mb-3">Book Your Adventure</h2>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-3">Book Your Adventure</h2>
               <p className="text-base mb-6 max-w-lg" style={{ color: "rgba(255,255,255,0.9)" }}>
                 Inshore, offshore, or sunset cruises — every trip includes tackle, bait, and a Coast Guard certified captain.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setView("charters")}
-                  className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105"
-                  style={{ backgroundColor: "white", color: "#0A1628" }}
+                  className="px-8 py-3 font-semibold text-sm cursor-pointer transition-all hover:opacity-90"
+                  style={{ backgroundColor: "white", color: "#0A1628", borderRadius: "4px" }}
                 >
                   View Charters
                 </button>
                 <button
                   onClick={() => setView("charters")}
-                  className="px-8 py-3 font-bold text-sm uppercase tracking-wider cursor-pointer transition-all hover:scale-105 border-2 border-white"
-                  style={{ backgroundColor: "transparent", color: "white" }}
+                  className="px-8 py-3 font-semibold text-sm cursor-pointer transition-all hover:opacity-90"
+                  style={{ backgroundColor: "transparent", color: "white", border: "2px solid white", borderRadius: "4px" }}
                 >
                   Starting at $250
                 </button>
@@ -1724,11 +1717,11 @@ function Always80AppInner() {
             </div>
           </div>
 
-          {/* === BEST SELLERS Carousel === */}
+          {/* === Best Sellers === */}
           {merch.length > 0 && (
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10" style={{ borderTop: "1px solid #E5E7EB" }}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Best Sellers</h2>
+                <h2 className="text-xl font-semibold" style={{ color: "#0A1628" }}>Best Sellers</h2>
               </div>
               <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
                 {[...merch].sort((a, b) => a.id.localeCompare(b.id)).map((item) => (
@@ -1740,12 +1733,12 @@ function Always80AppInner() {
             </div>
           )}
 
-          {/* === TACKLE — Category Carousel === */}
+          {/* === Tackle === */}
           {merch.filter(m => m.category === "tackle").length > 0 && (
-            <div id="section-tackle" className="py-10 px-4 sm:px-6" style={{ backgroundColor: "#F8FAFC" }}>
+            <div id="section-tackle" className="py-10 px-4 sm:px-6" style={{ borderTop: "1px solid #E5E7EB" }}>
               <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Tackle</h2>
+                  <h2 className="text-xl font-semibold" style={{ color: "#0A1628" }}>Tackle</h2>
                   <span className="text-sm" style={{ color: COLORS.midGray }}>{merch.filter(m => m.category === "tackle").length} items</span>
                 </div>
                 <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
@@ -1759,12 +1752,12 @@ function Always80AppInner() {
             </div>
           )}
 
-          {/* === ACCESSORIES — Category Carousel === */}
+          {/* === Accessories === */}
           {merch.filter(m => m.category === "accessory").length > 0 && (
-            <div id="section-accessories" className="py-10 px-4 sm:px-6" style={{ backgroundColor: "#F0F7FF" }}>
+            <div id="section-accessories" className="py-10 px-4 sm:px-6" style={{ borderTop: "1px solid #E5E7EB" }}>
               <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-black uppercase tracking-wider" style={{ color: "#0A1628" }}>Accessories</h2>
+                  <h2 className="text-xl font-semibold" style={{ color: "#0A1628" }}>Accessories</h2>
                   <span className="text-sm" style={{ color: COLORS.midGray }}>{merch.filter(m => m.category === "accessory").length} items</span>
                 </div>
                 <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
@@ -1778,9 +1771,9 @@ function Always80AppInner() {
             </div>
           )}
 
-          {/* === PRODUCTS & DOWNLOADS === */}
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-            <h2 className="text-2xl font-black uppercase tracking-wider mb-6" style={{ color: "#0A1628" }}>Products & Downloads</h2>
+          {/* === Products & Downloads === */}
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10" style={{ borderTop: "1px solid #E5E7EB" }}>
+            <h2 className="text-xl font-semibold mb-6" style={{ color: "#0A1628" }}>Products & Downloads</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {creator.products.map((product) => (
                 <ProductCard key={product.id} product={product} onPurchase={handlePurchase} openWalletModal={() => walletModal.setVisible(true)} />
@@ -1788,11 +1781,11 @@ function Always80AppInner() {
             </div>
           </div>
 
-          {/* === MEMBERSHIP TIERS === */}
-          <div id="tiers-section" className="py-12 px-4 sm:px-6" style={{ backgroundColor: "#E0F2FE" }}>
+          {/* === Membership Tiers === */}
+          <div id="tiers-section" className="py-12 px-4 sm:px-6" style={{ borderTop: "1px solid #E5E7EB" }}>
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-black uppercase tracking-wider mb-2" style={{ color: "#0A1628" }}>Membership Tiers</h2>
+                <h2 className="text-xl font-semibold mb-2" style={{ color: "#0A1628" }}>Membership Tiers</h2>
                 <p className="text-sm" style={{ color: COLORS.lightText }}>Unlock exclusive content, secret spots, and VIP charter access</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1858,7 +1851,7 @@ function Always80AppInner() {
             <div>
               <h2 className="text-xl font-black text-slate-900 mb-1">Now Playing</h2>
               <p className="text-sm mb-4" style={{ color: COLORS.lightText }}>{selectedVideo.title}</p>
-              <div className="rounded-xl overflow-hidden border" style={{ borderColor: "#CBD5E1" }}>
+              <div className="rounded-xl overflow-hidden border" style={{ borderColor: "#E5E7EB" }}>
                 <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
                   <iframe
                     className="absolute inset-0 w-full h-full"
@@ -1879,9 +1872,9 @@ function Always80AppInner() {
                   <button
                     key={video.id}
                     onClick={() => setSelectedVideo(video)}
-                    className="rounded-xl overflow-hidden border text-left transition-all cursor-pointer hover:border-purple-500"
+                    className="rounded-xl overflow-hidden border text-left transition-all cursor-pointer hover:border-gray-300"
                     style={{
-                      backgroundColor: selectedVideo.id === video.id ? "#EFF6FF" : COLORS.cardBg,
+                      backgroundColor: selectedVideo.id === video.id ? "#F5F5F5" : COLORS.cardBg,
                       borderColor: selectedVideo.id === video.id ? COLORS.purple : "#CBD5E1",
                     }}
                   >
@@ -1892,7 +1885,7 @@ function Always80AppInner() {
                         className="w-full aspect-video object-cover"
                       />
                       {selectedVideo.id === video.id && (
-                        <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: "rgba(124, 58, 237, 0.3)" }}>
+                        <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: "rgba(10, 22, 40, 0.3)" }}>
                           <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
                               <rect x="6" y="4" width="4" height="16" />
@@ -1903,7 +1896,7 @@ function Always80AppInner() {
                       )}
                       {selectedVideo.id !== video.id && (
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity" style={{ backgroundColor: "rgba(0,0,0,0.4)" }}>
-                          <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(124, 58, 237, 0.9)" }}>
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(8, 145, 212, 0.9)" }}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
                               <polygon points="5 3 19 12 5 21 5 3" />
                             </svg>
@@ -1914,7 +1907,7 @@ function Always80AppInner() {
                     <div className="px-3 py-2.5">
                       <p className="text-sm font-semibold text-slate-900 leading-tight">{video.title}</p>
                       {video.featured && (
-                        <span className="inline-block text-xs mt-1 px-2 py-0.5 rounded-full" style={{ backgroundColor: "#EDE9FE", color: "#7C3AED" }}>Featured</span>
+                        <span className="inline-block text-xs mt-1 px-2 py-0.5 rounded-full" style={{ backgroundColor: "#F5F5F5", color: "#0A1628" }}>Featured</span>
                       )}
                     </div>
                   </button>
@@ -1962,7 +1955,7 @@ function Always80AppInner() {
               {/* 2 Latest Videos side by side */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {VIDEOS.slice(0, 2).map((video) => (
-                  <div key={video.id} className="rounded-xl overflow-hidden border" style={{ borderColor: "#CBD5E1" }}>
+                  <div key={video.id} className="rounded-xl overflow-hidden border" style={{ borderColor: "#E5E7EB" }}>
                     <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
                       <iframe
                         className="absolute inset-0 w-full h-full"
@@ -2010,7 +2003,7 @@ function Always80AppInner() {
               )}
 
               {/* Show Schedule */}
-              <div className="rounded-xl p-4 border" style={{ backgroundColor: COLORS.cardBg, borderColor: "#CBD5E1" }}>
+              <div className="rounded-xl p-4 border" style={{ backgroundColor: COLORS.cardBg, borderColor: "#E5E7EB" }}>
                 <h3 className="text-slate-900 font-bold text-sm mb-3">Upcoming Charter Trips & Live Shows</h3>
                 <div className="space-y-2">
                   {[
@@ -2018,7 +2011,7 @@ function Always80AppInner() {
                     { day: "Wednesday", time: "5:00 AM", show: "Offshore Deep Sea Trips" },
                     { day: "Daily", time: "Sunset", show: "Evening Snook & Tarpon Runs" },
                   ].map((sched, i) => (
-                    <div key={i} className="flex items-center gap-3 p-2 rounded-lg" style={{ backgroundColor: "#E8F0FE" }}>
+                    <div key={i} className="flex items-center gap-3 p-2 rounded-lg" style={{ backgroundColor: "#F5F5F5" }}>
                       <span className="text-xs font-bold w-28 shrink-0" style={{ color: COLORS.teal }}>{sched.day}</span>
                       <span className="text-xs w-20 shrink-0" style={{ color: COLORS.lightText }}>{sched.time}</span>
                       <span className="text-xs" style={{ color: COLORS.lightText }}>{sched.show}</span>
@@ -2053,8 +2046,8 @@ function Always80AppInner() {
         )}
       </div>
 
-      {/* === FOOTER — Salt Life inspired multi-column === */}
-      <footer className="border-t" style={{ borderColor: "#CBD5E1", backgroundColor: "#0F2942" }}>
+      {/* === Footer — clean white === */}
+      <footer style={{ borderTop: "1px solid #E5E7EB", backgroundColor: "#FFFFFF" }}>
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             {/* Brand */}
@@ -2066,7 +2059,7 @@ function Always80AppInner() {
             </div>
             {/* Shop */}
             <div>
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Shop</h4>
+              <h4 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: "#0A1628" }}>Shop</h4>
               <div className="space-y-2">
                 {[
                   { label: "Apparel", action: () => { const el = document.getElementById("merch-section"); el?.scrollIntoView({ behavior: "smooth" }); setView("storefront"); } },
@@ -2074,7 +2067,10 @@ function Always80AppInner() {
                   { label: "Products & Downloads", action: () => setView("storefront") },
                   { label: "Memberships", action: () => setView("storefront") },
                 ].map((link) => (
-                  <button key={link.label} onClick={link.action} className="block text-xs cursor-pointer hover:text-white transition-colors" style={{ color: COLORS.midGray }}>
+                  <button key={link.label} onClick={link.action} className="block text-xs cursor-pointer transition-colors" style={{ color: COLORS.midGray }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#0A1628")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = COLORS.midGray)}
+                  >
                     {link.label}
                   </button>
                 ))}
@@ -2082,14 +2078,17 @@ function Always80AppInner() {
             </div>
             {/* Explore */}
             <div>
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Explore</h4>
+              <h4 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: "#0A1628" }}>Explore</h4>
               <div className="space-y-2">
                 {[
                   { label: "Fishing Charters", action: () => setView("charters") },
                   { label: "Videos", action: () => setView("videos") },
                   { label: "Feed & Reports", action: () => setView("feed") },
                 ].map((link) => (
-                  <button key={link.label} onClick={link.action} className="block text-xs cursor-pointer hover:text-white transition-colors" style={{ color: COLORS.midGray }}>
+                  <button key={link.label} onClick={link.action} className="block text-xs cursor-pointer transition-colors" style={{ color: COLORS.midGray }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#0A1628")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = COLORS.midGray)}
+                  >
                     {link.label}
                   </button>
                 ))}
@@ -2097,12 +2096,12 @@ function Always80AppInner() {
             </div>
             {/* Connect */}
             <div>
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Connect</h4>
+              <h4 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: "#0A1628" }}>Connect</h4>
               <div className="space-y-2">
                 <p className="text-xs" style={{ color: COLORS.midGray }}>Follow us for daily fishing reports and charter updates.</p>
                 <div className="flex gap-3 mt-3">
                   {["YouTube", "Instagram", "TikTok"].map((social) => (
-                    <span key={social} className="text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:opacity-80" style={{ backgroundColor: COLORS.cardBg, color: COLORS.lightText }}>
+                    <span key={social} className="text-xs px-3 py-1.5 cursor-pointer" style={{ backgroundColor: "#F5F5F5", color: COLORS.lightText, borderRadius: "4px" }}>
                       {social}
                     </span>
                   ))}
@@ -2110,13 +2109,13 @@ function Always80AppInner() {
               </div>
             </div>
           </div>
-          <div className="border-t pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid #E5E7EB" }}>
             <p className="text-xs" style={{ color: COLORS.midGray }}>
               &copy; 2026 Always 80 and Sunny. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <span className="text-xs" style={{ color: COLORS.midGray }}>Powered by Solana</span>
-              <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#D1FAE5", color: COLORS.teal }}>DEVNET</span>
+              <span className="text-xs px-2 py-0.5" style={{ backgroundColor: "#D1FAE5", color: COLORS.teal, borderRadius: "4px" }}>DEVNET</span>
             </div>
           </div>
         </div>
@@ -2127,7 +2126,7 @@ function Always80AppInner() {
 
 export default function Always80App() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: COLORS.darkBg }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: "#FFFFFF" }} />}>
       <Always80AppInner />
     </Suspense>
   );

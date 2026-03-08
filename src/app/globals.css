@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --dark-bg: #0F0A1E;
-  --purple: #9945FF;
-  --teal: #14F195;
-  --card-bg: #1A1333;
-  --light-text: #B8B8D0;
-  --mid-gray: #6B6B8D;
+  --dark-bg: #FFFFFF;
+  --navy: #0A1628;
+  --teal: #0891D4;
+  --card-bg: #FFFFFF;
+  --light-text: #334155;
+  --mid-gray: #6B7F99;
 }
 
 html {
@@ -15,8 +15,8 @@ html {
 }
 
 body {
-  background-color: var(--dark-bg);
-  color: white;
+  background-color: #FFFFFF;
+  color: #0A1628;
   font-family: Arial, Helvetica, sans-serif;
   -webkit-tap-highlight-color: transparent;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);

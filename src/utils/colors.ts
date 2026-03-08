@@ -1,8 +1,12 @@
 export const COLORS = {
-  darkBg: "#F0F7FF",       // light sky blue-white
-  purple: "#E08A00",       // warm amber/gold (primary accent - slightly brighter)
-  teal: "#0891D4",         // ocean blue (secondary accent)
-  cardBg: "#FFFFFF",       // white cards
-  lightText: "#334155",    // dark slate for readable body text
-  midGray: "#6B7F99",      // softer mid-tone
+  darkBg: "#FFFFFF",         // white — all backgrounds
+  white: "#FFFFFF",          // explicit white
+  darkNavy: "#0A1628",       // dark navy — all text, primary buttons
+  teal: "#0891D4",           // ocean teal — accent only (prices, active states)
+  cardBg: "#FFFFFF",         // white cards
+  lightGray: "#F5F5F5",     // product image backgrounds, input fields
+  dividerGray: "#E5E7EB",   // thin 1px section dividers
+  lightText: "#334155",      // body text
+  midGray: "#6B7F99",        // secondary text
+  purple: "#0A1628",         // mapped to navy (replaces old amber)
 };
