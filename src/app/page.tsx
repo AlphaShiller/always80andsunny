@@ -950,7 +950,9 @@ function RotatingHeroBanner({ merch, onShopNow }: { merch: MerchItem[]; onShopNo
           opacity: slide === 0 ? 1 : 0,
           transform: slide === 0 ? "translateX(0)" : "translateX(-100%)",
           pointerEvents: slide === 0 ? "auto" : "none",
-          background: "linear-gradient(135deg, #0891D4 0%, #0A1628 60%, #E08A00 100%)",
+          backgroundImage: "linear-gradient(135deg, rgba(8,145,212,0.7) 0%, rgba(10,22,40,0.65) 50%, rgba(224,138,0,0.6) 100%), url('/beach-bg.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
       >
         <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center gap-8 w-full">
@@ -1002,7 +1004,9 @@ function RotatingHeroBanner({ merch, onShopNow }: { merch: MerchItem[]; onShopNo
           opacity: slide === 1 ? 1 : 0,
           transform: slide === 1 ? "translateX(0)" : "translateX(100%)",
           pointerEvents: slide === 1 ? "auto" : "none",
-          background: "linear-gradient(135deg, #F0F7FF 0%, #E0F2FE 50%, #BAE6FD 100%)",
+          backgroundImage: "linear-gradient(135deg, rgba(240,247,255,0.85) 0%, rgba(224,242,254,0.8) 50%, rgba(186,230,253,0.75) 100%), url('/beach-bg.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
       >
         {newestItem ? (
